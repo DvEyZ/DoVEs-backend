@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { LabModel, LabSchema } from "../Lab.model";
+import { LabModel } from "../Lab.model";
 import { Machine } from "../Machine.model";
 import { dockerConnection } from "../../services/Docker.service";
 import { Container } from "node-docker-api/lib/container";
@@ -33,7 +33,7 @@ DockerLabSchema.pre('save', function (next) {
     
     // Create Docker lab (preferably via docker-compose)
 
-    next();
+    return next();
 })
 
 DockerLabSchema.pre('deleteOne', {document:true,query:false}, function (next) {

@@ -30,7 +30,7 @@ const LabController = {
         }
         catch(e)
         {
-
+            // Add error handling
         }
     },
 

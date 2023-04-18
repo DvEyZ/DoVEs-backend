@@ -14,9 +14,9 @@ export interface Lab extends Document
 }
 
 export const LabSchema = new Schema({
-    _id: {type: String},
-    template: {type: String},
-    portPrefix: {type :String}
+    _id: {type: String, required: true},
+    template: {type: String, required: true},
+    portPrefix: {type :String, required: true}
 });
 
 export const LabModel = mongoose.model<Lab>('Lab',LabSchema);
