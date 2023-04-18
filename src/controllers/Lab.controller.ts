@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Lab, LabModel } from '../models/Lab.model';
 import { LabFactory } from '../models/LabFactory.model';
 
-const getUpStatus = (lab :Lab) :Promise<Number> =>
+const getUpStatus = async(lab :Lab) :Promise<Number> =>
 {
     return lab.getMachines().then((machines) => {
         let run = machines.filter((v) => v.status == 'running')
@@ -78,7 +78,7 @@ const LabController = {
                 return res.json({message: 'Not found'}).status(404);
             }
 
-            else res.json({
+            res.json({
                 name: lab._id,
                 type: lab.__t,
                 up: await getUpStatus(lab),
@@ -119,7 +119,7 @@ const LabController = {
             }
 
             let machines = await lab.getMachines();
-            machines.forEach(async (machine) => {
+            await Promise.all(machines.map(async (machine) => {
                 try
                 {
                     if(op === 'start')
@@ -128,27 +128,27 @@ const LabController = {
                         await machine.stop();
                     else if(op === 'restart')
                         await machine.restart();
-
-                    let lab = await LabModel.findById(req.params.lab);
-            
-                    res.json({
-                        name: lab!._id,
-                        type: lab!.__t,
-                        up: await getUpStatus(lab!),
-                        template: lab!.template,
-                        machines: (await lab!.getMachines()).map((machine) => {
-                                return {
-                                    name: machine.name,
-                                    status: machine.status
-                                }
-                            })
-                        }).status(201);
                 }
                 catch(e)
                 {
                     // Error handling
                 }
-            })
+            }));
+            
+            let nLab = await LabModel.findById(req.params.lab);
+
+            return res.json({
+                name: nLab!._id,
+                type: nLab!.__t,
+                up: await getUpStatus(nLab!),
+                template: nLab!.template,
+                machines: (await nLab!.getMachines()).map((machine) => {
+                    return {
+                        name: machine.name,
+                        status: machine.status
+                    }
+                })
+            }).status(201);
         }
         catch(e)
         {
