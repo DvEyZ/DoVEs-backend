@@ -38,7 +38,12 @@ const LabController = {
     {
         try
         {
-            let lab :Lab = await LabFactory(req.body.type)!.create({
+            let model = LabFactory(req.body.type);
+
+            if(!model)
+                return res.json({message: 'Invalid type'}).status(400);    
+
+            let lab :Lab = await model.create({
                 _id: req.body.name,
                 template: req.body.template,
                 portPrefix: req.body.portPrefix,
@@ -113,27 +118,15 @@ const LabController = {
 
             let op = req.body.action;
 
-            if(!(['start','stop','restart'].includes(op)))
-            {
-                return res.json({message: 'Invalid operation'}).status(400);
-            }
 
-            let machines = await lab.getMachines();
-            await Promise.all(machines.map(async (machine) => {
-                try
-                {
-                    if(op === 'start')
-                        await machine.start();
-                    else if(op === 'stop')
-                        await machine.stop();
-                    else if(op === 'restart')
-                        await machine.restart();
-                }
-                catch(e)
-                {
-                    // Error handling
-                }
-            }));
+            if(op == 'start')
+                await lab.start();
+            else if(op == 'stop')
+                await lab.stop();
+            else if(op == 'restart')
+                await lab.restart();
+            else
+                return res.json({message: 'Invalid operation'}).status(400);
             
             let nLab = await LabModel.findById(req.params.lab);
 

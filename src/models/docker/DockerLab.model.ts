@@ -28,6 +28,18 @@ DockerLabSchema.methods.getMachine = async function (name :string) :Promise<Mach
     })
 }
 
+DockerLabSchema.methods.start = async function () :Promise<any> {
+    // docker-compose start
+}
+
+DockerLabSchema.methods.stop = async function () :Promise<any> {
+    // docker-compose stop
+}
+
+DockerLabSchema.methods.restart = async function () :Promise<any> {
+    // docker-compose restart
+}
+
 DockerLabSchema.pre('save', function (next) {
     if(!this.isNew) return next();
     

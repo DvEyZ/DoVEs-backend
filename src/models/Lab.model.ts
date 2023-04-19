@@ -11,6 +11,10 @@ export interface Lab extends Document
 
     getMachines() :Promise<Array<Machine>>;
     getMachine(name :string) :Promise<Machine>;
+
+    start() :Promise<any>;
+    stop() :Promise<any>;
+    restart() :Promise<any>;
 }
 
 export const LabSchema = new Schema({

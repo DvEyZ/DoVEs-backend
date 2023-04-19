@@ -69,7 +69,7 @@ const MachineController = {
             {
                 return res.json({message: 'Invalid operation'}).status(400);
             }
-
+            
             if(op === 'start')
                 await machine.start();
             else if(op === 'stop')
