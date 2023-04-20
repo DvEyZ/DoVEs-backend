@@ -12,6 +12,7 @@ export interface Template extends Document
     _id :string;
     __t :string;
     machineDefs: Array<MachineDefinition>;
+    supplement: object;
 }
 
 const TemplateSchema = new Schema({
@@ -19,14 +20,3 @@ const TemplateSchema = new Schema({
 })
 
 export const TemplateModel = mongoose.model<Template>('Template', TemplateSchema);
-
-export interface DockerTemplate extends Template
-{
-    composeBase :string;
-}
-
-const DockerTemplateSchema = new Schema({
-    composeBase :{type: String, required: true}
-})
-
-export const DockerTemplateModel = TemplateModel.discriminator<DockerTemplate>('docker', DockerTemplateSchema);

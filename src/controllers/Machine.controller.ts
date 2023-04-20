@@ -1,6 +1,5 @@
-import createError from 'http-errors';
 import { Request, Response } from 'express';
-import { LabModel, Lab } from '../models/Lab.model';
+import { LabModel } from '../models/Lab.model';
 
 const MachineController = {
     async list(req :Request, res :Response)
