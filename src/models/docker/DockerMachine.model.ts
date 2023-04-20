@@ -1,5 +1,4 @@
 import { Machine } from "../Machine.model";
-import { dockerConnection } from "../../services/Docker.service";
 import DockerConfig from "../../configs/Docker.config";
 import { Container } from "node-docker-api/lib/container";
 
@@ -38,17 +37,17 @@ export class DockerMachine implements Machine
         return data.State;
     }
     
-    async start() :Promise<any>
+    async start() :Promise<Container>
     {
         return this.container.start();
     }
 
-    async stop() :Promise<any>
+    async stop() :Promise<Container>
     {
         return this.container.stop();
     }
 
-    async restart() :Promise<any> 
+    async restart() :Promise<Container> 
     {
         return this.container.restart();
     }

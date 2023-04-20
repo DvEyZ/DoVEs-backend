@@ -4,8 +4,8 @@ export interface Machine
     readonly type :string;
     readonly address :string;
     readonly portRedirections :Array<{inbound :string, outbound :string}>;
+    readonly supplement :object;
     readonly status :string;
-    readonly supplement: object;
 
     start() :Promise<any>;
     stop() :Promise<any>;

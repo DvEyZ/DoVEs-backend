@@ -8,9 +8,8 @@ const MachineController = {
         {
             let lab = await LabModel.findById(req.params.lab);
             if(!lab)
-            {
                 return res.json({message: 'Not found'}).status(404);
-            }
+
             let m = await lab.getMachines();
 
             return res.json({
@@ -34,9 +33,8 @@ const MachineController = {
         {
             let lab = await LabModel.findById(req.params.lab);
             if(!lab)
-            {
                 return res.json({message: 'Not found'}).status(404);
-            }
+            
             let machine = await lab.getMachine(req.params.machine);
 
             return res.json({
@@ -57,9 +55,8 @@ const MachineController = {
         {
             let lab = await LabModel.findById(req.params.lab);
             if(!lab)
-            {
                 return res.json({message: 'Not found'}).status(404);
-            }
+            
             let machine = await lab.getMachine(req.params.machine);
 
             let op = req.body.action;
