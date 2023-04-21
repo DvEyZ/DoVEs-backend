@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { TemplateModel } from '../models/Template.model';
-import { TemplateFactory } from '../models/TemplateFactory.model';
+import { TemplateFactory } from '../models/factories/TemplateFactory.model';
 
 const TemplateController = {
     async list(req :Request, res :Response)
@@ -20,7 +20,10 @@ const TemplateController = {
         }
         catch(e)
         {
-            // Add error handling
+            let message = 'Internal server error';
+            let status = 500;
+
+            return res.json({message: message}).status(status);
         }
     },
 
@@ -28,10 +31,17 @@ const TemplateController = {
     {
         try 
         {
+            if(!(
+                'name' in req.body && 
+                'type' in req.body && 
+                'machineDefs' in req.body
+            ))
+                return res.json({message: 'Missing properties.'}).status(422);
+            
             let model = TemplateFactory(req.body.type);
 
             if(!model)
-                return res.json({message: 'Invalid type'}).status(400); 
+                return res.json({message: 'Invalid template type'}).status(422); 
 
             let newTemplate = await model.create({
                 _id: req.body.name,
@@ -50,7 +60,10 @@ const TemplateController = {
         } 
         catch (e) 
         {
-            // Add error handling
+            let message = 'Internal server error';
+            let status = 500;
+
+            return res.json({message: message}).status(status);
         }
     },
     
@@ -72,7 +85,10 @@ const TemplateController = {
         } 
         catch (e) 
         {
-            // Add error handling
+            let message = 'Internal server error';
+            let status = 500;
+
+            return res.json({message: message}).status(status);
         }
     },
     
@@ -80,6 +96,13 @@ const TemplateController = {
     {
         try 
         {
+            if(!(
+                'name' in req.body && 
+                'type' in req.body && 
+                'machineDefs' in req.body
+            ))
+                return res.json({message: 'Missing properties.'}).status(422);
+
             let newTemplate = await TemplateModel.findById(req.body.name);
 
             if(!newTemplate)
@@ -99,7 +122,10 @@ const TemplateController = {
         } 
         catch (e) 
         {
-            // Add error handling
+            let message = 'Internal server error';
+            let status = 500;
+
+            return res.json({message: message}).status(status);
         }
     },
 
@@ -107,7 +133,7 @@ const TemplateController = {
     {
         try 
         {
-            let template = await TemplateModel.findByIdAndDelete(req.body.name);
+            let template = await TemplateModel.findByIdAndDelete(req.params.template);
 
             if(!template)
                 return res.json({message: 'Not found'}).status(404);
@@ -121,7 +147,10 @@ const TemplateController = {
         } 
         catch (e) 
         {
-            // Add error handling
+            let message = 'Internal server error';
+            let status = 500;
+
+            return res.json({message: message}).status(status);
         }
     }, 
 }

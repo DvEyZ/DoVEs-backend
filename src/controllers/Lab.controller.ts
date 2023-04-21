@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { Lab, LabModel } from '../models/Lab.model';
-import { LabFactory } from '../models/LabFactory.model';
+import { LabFactory } from '../models/factories/LabFactory.model';
 
 const getUpStatus = async(lab :Lab) :Promise<Number> =>
 {
@@ -23,14 +23,17 @@ const LabController = {
                     return {
                         name: lab._id,
                         type: lab.__t,
-                        up: await getUpStatus(lab)
+                        up: await getUpStatus(lab),
                     }
                 })
             }).status(200);
         }
         catch(e)
         {
-            // Add error handling
+            let message = 'Internal server error';
+            let status = 500;
+
+            return res.json({message: message}).status(status);
         }
     },
 
@@ -38,10 +41,19 @@ const LabController = {
     {
         try
         {
+            if(!(
+                'name' in req.body && 
+                'type' in req.body && 
+                'template' in req.body &&
+                'portPrefix' in req.body &&
+                'machineCount' in req.body
+            ))
+                return res.json({message: 'Missing properties.'}).status(422);
+
             let model = LabFactory(req.body.type);
 
             if(!model)
-                return res.json({message: 'Invalid type'}).status(400);    
+                return res.json({message: 'Invalid lab type.'}).status(422);
 
             let lab :Lab = await model.create({
                 _id: req.body.name,
@@ -67,8 +79,7 @@ const LabController = {
         {
             let message = 'Internal server error';
             let status = 500;
-            if(e instanceof Error) message = e.message;
-            if(e instanceof TypeError) status = 400;
+
             return res.json({message: message}).status(status);
         }
     },
@@ -110,11 +121,14 @@ const LabController = {
     {
         try
         {
+            if(!(
+                'op' in req.body
+            ))
+                return res.json({message: 'Missing properties.'}).status(422);
+            
             let lab = await LabModel.findById(req.params.lab);
             if(!lab) 
-            {
                 return res.json({message: 'Not found'}).status(404);
-            }
 
             let op = req.body.action;
 
@@ -145,7 +159,10 @@ const LabController = {
         }
         catch(e)
         {
-            // Error handling
+            let message = 'Internal server error';
+            let status = 500;
+
+            return res.json({message: message}).status(status);
         }
     }, 
     
@@ -168,7 +185,10 @@ const LabController = {
         }
         catch(e)
         {
-            // Error handling
+            let message = 'Internal server error';
+            let status = 500;
+
+            return res.json({message: message}).status(status);
         }
     }
 }

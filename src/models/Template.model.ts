@@ -4,7 +4,7 @@ export interface MachineDefinition
 {
     name :string;
     ports :Array<{inbound :string, outbound :string}>;
-    supplement :object;
+    supplement :any;
 }
 
 export interface Template extends Document

@@ -53,6 +53,11 @@ const MachineController = {
     {
         try
         {
+            if(!(
+                'op' in req.body
+            ))
+                return res.json({message: 'Missing properties.'}).status(422);
+
             let lab = await LabModel.findById(req.params.lab);
             if(!lab)
                 return res.json({message: 'Not found'}).status(404);

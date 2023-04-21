@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { LabModel } from "../Lab.model";
+import { Lab, LabModel } from "../Lab.model";
 import { Machine } from "../Machine.model";
 import { dockerConnection } from "../../services/Docker.service";
 import { Container } from "node-docker-api/lib/container";
@@ -59,4 +59,4 @@ DockerLabSchema.pre('deleteOne', {document:true,query:false}, function (next) {
     }).catch((e) => {next(e);});
 });
 
-export const DockerLabModel = LabModel.discriminator('docker', DockerLabSchema);
+export const DockerLabModel = LabModel.discriminator<Lab>('docker', DockerLabSchema);
