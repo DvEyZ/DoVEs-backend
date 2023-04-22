@@ -3,13 +3,11 @@ import { Schema } from "mongoose";
 
 export interface DockerTemplate extends Template
 {
-    
+    supplement: {
+        base: string
+    }
 }
 
-const DockerTemplateSchema = new Schema({
-    supplement: {
-        base: {type: String}
-    }
-})
+const DockerTemplateSchema = new Schema({})
 
 export const DockerTemplateModel = TemplateModel.discriminator<DockerTemplate>('docker', DockerTemplateSchema);

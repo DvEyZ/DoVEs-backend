@@ -41,11 +41,11 @@ DockerLabSchema.methods.restart = async function () :Promise<any> {
 }
 
 DockerLabSchema.pre('save', function (next) {
-    if(!this.isNew) return next();
+    if(!this.isNew) next();
     
     // Create Docker lab (preferably via docker-compose)
 
-    return next();
+    next();
 })
 
 DockerLabSchema.pre('deleteOne', {document:true,query:false}, function (next) {
@@ -54,9 +54,9 @@ DockerLabSchema.pre('deleteOne', {document:true,query:false}, function (next) {
         v!.getMachines().then((machines) => {
             Promise.all(machines.map(async (m) => m.tearDown())).then(() => {
                 next();
-            }).catch((e) => {next(e);})
+            }).catch((e) => {return next(e);})
         })
-    }).catch((e) => {next(e);});
+    }).catch((e) => {return next(e);});
 });
 
 export const DockerLabModel = LabModel.discriminator<Lab>('docker', DockerLabSchema);

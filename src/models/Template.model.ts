@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 export interface MachineDefinition
 {
@@ -7,12 +7,12 @@ export interface MachineDefinition
     supplement :any;
 }
 
-export interface Template extends Document
+export interface Template
 {
     _id :string;
     __t :string;
     machineDefs: Array<MachineDefinition>;
-    supplement: object;
+    supplement: any;
 }
 
 const TemplateSchema = new Schema({

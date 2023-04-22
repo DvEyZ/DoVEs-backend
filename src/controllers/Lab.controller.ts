@@ -46,7 +46,8 @@ const LabController = {
                 'type' in req.body && 
                 'template' in req.body &&
                 'portPrefix' in req.body &&
-                'machineCount' in req.body
+                'machineCount' in req.body &&
+                'loginProviders' in req.body
             ))
                 return res.json({message: 'Missing properties.'}).status(422);
 
@@ -59,7 +60,8 @@ const LabController = {
                 _id: req.body.name,
                 template: req.body.template,
                 portPrefix: req.body.portPrefix,
-                machineCount: req.body.machineCount
+                machineCount: req.body.machineCount,
+                loginProviders: req.body.loginProviders
             });
             
             return res.json({
@@ -88,7 +90,7 @@ const LabController = {
     {
         try
         {
-            let lab = await LabModel.findById(req.params.lab);
+            let lab = await LabModel.findById(req.params.lab).populate('loginProviders');
             if(!lab) 
             {
                 return res.json({message: 'Not found'}).status(404);
@@ -104,7 +106,9 @@ const LabController = {
                         name: machine.name,
                         status: machine.status
                     }
-                })
+                }),
+                loginProviders: lab.loginProviders
+
             }).status(201);
         }
         catch(e)
@@ -142,7 +146,7 @@ const LabController = {
             else
                 return res.json({message: 'Invalid operation'}).status(400);
             
-            let nLab = await LabModel.findById(req.params.lab);
+            let nLab = await LabModel.findById(req.params.lab).populate('loginProviders');
 
             return res.json({
                 name: nLab!._id,
@@ -154,7 +158,8 @@ const LabController = {
                         name: machine.name,
                         status: machine.status
                     }
-                })
+                }),
+                loginProviders: nLab!.loginProviders
             }).status(201);
         }
         catch(e)

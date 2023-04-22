@@ -3,7 +3,7 @@ export interface Machine
     readonly name :string;
     readonly type :string;
     readonly address :string;
-    readonly portRedirections :Array<{inbound :string, outbound :string}>;
+    readonly portRedirections :Array<{inbound :number, outbound :number, access :string | undefined}>;
     readonly supplement :object;
     readonly status :string;
 

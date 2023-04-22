@@ -10,7 +10,7 @@ export class DockerMachine implements Machine
     name :string;
     type :string;
     address: string;
-    portRedirections: Array<{ inbound: string; outbound: string; }>;
+    portRedirections: Array<{ inbound: number; outbound: number;  access: string | undefined}>;
     supplement: object;
 
     constructor(container :Container)
@@ -22,9 +22,13 @@ export class DockerMachine implements Machine
         this.name = data.Labels['com.docker.compose.service']
         this.type = 'docker';
         this.address = DockerConfig.host;
-        this.portRedirections = [...new Set<{ inbound: string; outbound: string; }>(
+        this.portRedirections = [...new Set<{ inbound: number; outbound: number; access: string | undefined }>(
             data.Ports.map((v :{IP :string, PrivatePort :number, PublicPort :number, Type :string}) => {
-                return {inbound :new String(v.PrivatePort), outbound :new String(v.PublicPort)}
+                return {
+                    inbound: v.PrivatePort, 
+                    outbound: v.PublicPort, 
+                    access: v.PrivatePort === 22 ? 'ssh' : undefined
+                }
             })
         )];
 
