@@ -22,7 +22,7 @@ const LabController = {
                 labs: labs.map(async (lab) => {
                     return {
                         name: lab._id,
-                        type: lab.__t,
+                        type: lab.type,
                         up: await getUpStatus(lab),
                     }
                 })
@@ -66,7 +66,7 @@ const LabController = {
             
             return res.json({
                 name: lab._id,
-                type: lab.__t,
+                type: lab.type,
                 up: await getUpStatus(lab),
                 template: lab.template,
                 machines: (await lab.getMachines()).map((machine) => {
@@ -98,7 +98,7 @@ const LabController = {
 
             res.json({
                 name: lab._id,
-                type: lab.__t,
+                type: lab.type,
                 up: await getUpStatus(lab),
                 template: lab.template,
                 machines: (await lab.getMachines()).map((machine) => {
@@ -150,7 +150,7 @@ const LabController = {
 
             return res.json({
                 name: nLab!._id,
-                type: nLab!.__t,
+                type: nLab!.type,
                 up: await getUpStatus(nLab!),
                 template: nLab!.template,
                 machines: (await nLab!.getMachines()).map((machine) => {
@@ -184,7 +184,7 @@ const LabController = {
 
             return res.json({
                 name: lab._id,
-                type: lab.__t,
+                type: lab.type,
                 template: lab.template
             }).status(200);
         }

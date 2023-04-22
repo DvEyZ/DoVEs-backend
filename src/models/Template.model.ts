@@ -10,13 +10,13 @@ export interface MachineDefinition
 export interface Template
 {
     _id :string;
-    __t :string;
+    type :string;
     machineDefs: Array<MachineDefinition>;
     supplement: any;
 }
 
 const TemplateSchema = new Schema({
     _id: {type: String, required: true}
-})
+}, {discriminatorKey: 'type'})
 
 export const TemplateModel = mongoose.model<Template>('Template', TemplateSchema);

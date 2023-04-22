@@ -13,7 +13,7 @@ const TemplateController = {
                 templates: templates.map((v) => {
                     return {
                         name: v._id,
-                        type: v.__t
+                        type: v.type
                     }
                 })
             }).status(200);
@@ -53,7 +53,7 @@ const TemplateController = {
 
             return res.json({
                 name: template._id,
-                type: template.__t,
+                type: template.type,
                 machineDefs: template.machineDefs,
                 supplement: template.supplement
             }).status(201);
@@ -78,7 +78,7 @@ const TemplateController = {
             
             return res.json({
                 name: template._id,
-                type: template.__t,
+                type: template.type,
                 machineDefs: template.machineDefs,
                 supplement: template.supplement
             }).status(200)
@@ -115,7 +115,7 @@ const TemplateController = {
     
             return res.json({
                 name: template._id,
-                type: template.__t,
+                type: template.type,
                 machineDefs: template.machineDefs,
                 supplement: template.supplement
             }).status(201);
@@ -140,7 +140,7 @@ const TemplateController = {
 
             return res.json({
                 name: template._id,
-                type: template.__t,
+                type: template.type,
                 machineDefs: template.machineDefs,
                 supplement: template.supplement
             })

@@ -5,7 +5,7 @@ import { LoginProvider } from "./LoginProviders/LoginProvider.model";
 export interface Lab
 {
     _id :string;
-    __t :string;
+    type :string;
     template :string;
     portPrefix :number;
     machineCount :number;
@@ -25,13 +25,13 @@ export const LabSchema = new Schema({
     portPrefix: {type :Number, required: true, min: 1, max: 5},
     machineCount: {type: Number, required: true},
     loginProviders: {type: [{type: Schema.Types.ObjectId, ref: 'LoginProvider'}], required: true}
-});
+}, {discriminatorKey: 'type'});
 
 LabSchema.post('save', async function (doc, next) {
     if(!this.isNew) return next();
 
     // Init login providers
-    let d = await LabModel.findById(doc._id);
+    let d = await LabModel.findById(doc._id).populate('loginProviders');
     let machines = await d!.getMachines();
 
     d!.loginProviders.forEach(async (provider) => {
