@@ -9,9 +9,9 @@ export interface Lab
     template :string;
     portPrefix :number;
     machineCount :number;
-    loginProviders :[LoginProvider];
+    loginProviders :LoginProvider[];
 
-    getMachines() :Promise<Array<Machine>>;
+    getMachines() :Promise<Machine[]>;
     getMachine(name :string) :Promise<Machine>;
 
     start() :Promise<any>;
@@ -35,11 +35,15 @@ LabSchema.post('save', async function (doc, next) {
     let machines = await d!.getMachines();
 
     d!.loginProviders.forEach(async (provider) => {
-        provider.createEnvironment(d!._id);
+        provider.createEnvironment(d!._id, {});
         machines.forEach((m) => {
-            provider.createConnection(m.name, m.address, m.portRedirections.filter((v) => {
+            m.portRedirections.filter((v) => {
                 return !!v.access;
-            })[0].outbound);
+            }).forEach((port) => {
+                provider.createConnection(m.name, d!._id, m.address, port.outbound, {
+                    protocol: port.access
+                });
+            })
         });
     });
 });

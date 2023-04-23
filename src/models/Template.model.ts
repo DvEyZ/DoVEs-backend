@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 export interface MachineDefinition
 {
     name :string;
-    ports :Array<{inbound :string, outbound :string}>;
+    ports :{inbound :string, outbound :string}[];
     supplement :any;
 }
 
@@ -11,7 +11,7 @@ export interface Template
 {
     _id :string;
     type :string;
-    machineDefs: Array<MachineDefinition>;
+    machineDefs: MachineDefinition[];
     supplement: any;
 }
 

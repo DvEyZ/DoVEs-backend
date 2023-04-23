@@ -21,11 +21,13 @@ export const GuacamoleLoginProviderSchema = new Schema({
     }
 });
 
-GuacamoleLoginProviderSchema.methods.createEnvironment = async (name :string) :Promise<any> => {
+GuacamoleLoginProviderSchema.methods.createEnvironment = async (name :string, config :{}) :Promise<any> => {
     // Create Guacamole groups
 }
 
-GuacamoleLoginProviderSchema.methods.createConnection = async (name :string, group :string, host :string, port :number) :Promise<any> => {
+GuacamoleLoginProviderSchema.methods.createConnection = async (name :string, group :string, host :string, port :number, config :{
+    protocol: string
+}) :Promise<any> => {
     // Create Guacamole users and connections
 }
 
