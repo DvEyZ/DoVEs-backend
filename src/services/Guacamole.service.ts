@@ -40,25 +40,48 @@ interface IGuacamoleService
 
 class GuacamoleService implements IGuacamoleService 
 {
-    static keys :{
-        [key: string] :string
+    static apis :{
+        [key: string] :{token :string, dataSource :string}
     } = {};
 
     constructor(private apiUrl :string, private adminUsername :string, private adminPassword :string)
-    {}
-
-    #getKey() :string
     {
-        let key = GuacamoleService.keys[this.apiUrl];
-        if(!!key) return key;
-        else
-        {
-            // Request a key
-            return '';
-        }
-
-        // TODO - add key expiration handling
+        this.#getToken();
     }
+
+    async #requireNewToken() :Promise<any>
+    {
+        let key = await fetch(`${this.apiUrl}/tokens`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                username: this.adminUsername,
+                password: this.adminPassword
+            })
+        }).then((res) => res.json());
+
+        return key;
+    }
+
+    async #getToken() :Promise<{token :string, dataSource :string}>
+    {
+        if(!GuacamoleService.apis[this.apiUrl])
+        {
+            let newKey = await this.#requireNewToken();
+
+            GuacamoleService.apis[this.apiUrl] = {
+                token: newKey.authToken,
+                dataSource: newKey.dataSource,
+            }
+        }
+        let key = GuacamoleService.apis[this.apiUrl];
+
+        return key;
+    }
+
+    // Methods have to retry on 401.
 
     user(name :string) :GuacamoleServiceUser {
         return {
