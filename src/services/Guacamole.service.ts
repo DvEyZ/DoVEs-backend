@@ -85,12 +85,12 @@ export class GuacamoleService implements IGuacamoleService
 
     async #resolveConnectionName(connectionName :string) :Promise<any>
     {
-
+        // todo
     }
 
     async #resolveConnectionGroupName(connectionName :string) :Promise<any>
     {
-
+        // todo
     }
 
     user(name :string) :GuacamoleServiceUser {
@@ -241,59 +241,59 @@ export class GuacamoleService implements IGuacamoleService
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                            "parentIdentifier": groupName,
-                            "name": name,
-                            "protocol": protocol,
-                            "parameters": {
-                              "port": port,
-                              "read-only": "",
-                              "swap-red-blue": "",
-                              "cursor": "",
-                              "color-depth": "",
-                              "clipboard-encoding": "",
-                              "disable-copy": "",
-                              "disable-paste": "",
-                              "dest-port": "",
-                              "recording-exclude-output": "",
-                              "recording-exclude-mouse": "",
-                              "recording-include-keys": "",
-                              "create-recording-path": "",
-                              "enable-sftp": "",
-                              "sftp-port": "",
-                              "sftp-server-alive-interval": "",
-                              "enable-audio": "",
-                              "color-scheme": "",
-                              "font-size": "",
-                              "scrollback": "",
-                              "timezone": null,
-                              "server-alive-interval": "",
-                              "backspace": "",
-                              "terminal-type": "",
-                              "create-typescript-path": "",
-                              "hostname": host,
-                              "host-key": "",
-                              "private-key": "",
-                              "username": "",
-                              "password": "",
-                              "passphrase": "",
-                              "font-name": "",
-                              "command": "",
-                              "locale": "",
-                              "typescript-path": "",
-                              "typescript-name": "",
-                              "recording-path": "",
-                              "recording-name": "",
-                              "sftp-root-directory": ""
-                            },
-                            "attributes": {
-                              "max-connections": "",
-                              "max-connections-per-user": "",
-                              "weight": "",
-                              "failover-only": "",
-                              "guacd-port": "",
-                              "guacd-encryption": "",
-                              "guacd-hostname": ""
-                            }
+                        "parentIdentifier": groupName,
+                        "name": name,
+                        "protocol": protocol,
+                        "parameters": {
+                            "port": port,
+                            "read-only": "",
+                            "swap-red-blue": "",
+                            "cursor": "",
+                            "color-depth": "",
+                            "clipboard-encoding": "",
+                            "disable-copy": "",
+                            "disable-paste": "",
+                            "dest-port": "",
+                            "recording-exclude-output": "",
+                            "recording-exclude-mouse": "",
+                            "recording-include-keys": "",
+                            "create-recording-path": "",
+                            "enable-sftp": "",
+                            "sftp-port": "",
+                            "sftp-server-alive-interval": "",
+                            "enable-audio": "",
+                            "color-scheme": "",
+                            "font-size": "",
+                            "scrollback": "",
+                            "timezone": null,
+                            "server-alive-interval": "",
+                            "backspace": "",
+                            "terminal-type": "",
+                            "create-typescript-path": "",
+                            "hostname": host,
+                            "host-key": "",
+                            "private-key": "",
+                            "username": "",
+                            "password": "",
+                            "passphrase": "",
+                            "font-name": "",
+                            "command": "",
+                            "locale": "",
+                            "typescript-path": "",
+                            "typescript-name": "",
+                            "recording-path": "",
+                            "recording-name": "",
+                            "sftp-root-directory": ""
+                        },
+                        "attributes": {
+                            "max-connections": "",
+                            "max-connections-per-user": "",
+                            "weight": "",
+                            "failover-only": "",
+                            "guacd-port": "",
+                            "guacd-encryption": "",
+                            "guacd-hostname": ""
+                        }
                     })
                 });
                 return con;
@@ -308,43 +308,111 @@ export class GuacamoleService implements IGuacamoleService
                 }), {
                     method: 'DELETE'
                 });
-                return name;
+                return con;
             }
         }
     }
 
     userGroup(name :string) :GuacamoleServiceUserGroup
     {
+        let apiUrl = this.apiUrl
+        let getToken = this.#getToken;
         return {
-            get() :Promise<any>
+            async get() :Promise<any>
             {
-                return new Promise((resolve,reject) => {reject('because')});
+                let { token, dataSource } = await getToken();
+
+                let group = await fetch(`${apiUrl}/session/data/${dataSource}/userGroups/${name}?` + new URLSearchParams({
+                    'token': token
+                })).then((res) => res.json());
+                return group;
             },
-            create() :Promise<any>
+            async create() :Promise<any>
             {
-                return new Promise((resolve,reject) => {reject('because')});
+                let { token, dataSource } = await getToken();
+
+                let group = await fetch(`${apiUrl}/session/data/${dataSource}/userGroups?` + new URLSearchParams({
+                    'token': token
+                }), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "identifier": name,
+                        "attributes": {
+                            "disabled": ""
+                        }
+                    })
+                }).then((res) => res.json());
+                return group;
             },
-            delete() :Promise<any>
+            async delete() :Promise<any>
             {
-                return new Promise((resolve,reject) => {reject('because')});
+                let { token, dataSource } = await getToken();
+
+                let group = await fetch(`${apiUrl}/session/data/${dataSource}/userGroups/${name}?` + new URLSearchParams({
+                    'token': token
+                }), {
+                    method: 'DELETE'
+                });
+                return group;
             }
         }
     }
 
     connectionGroup(name :string) :GuacamoleServiceConnectionGroup
     {
+        let apiUrl = this.apiUrl
+        let getToken = this.#getToken;
+        let resolveConnectionGroupName = this.#resolveConnectionGroupName;
+
         return {
-            get() :Promise<any>
+            async get() :Promise<any>
             {
-                return new Promise((resolve,reject) => {reject('because')});
+                let { token, dataSource } = await getToken();
+                let conGroupName = await resolveConnectionGroupName(name);
+
+                let group = await fetch(`${apiUrl}/session/data/${dataSource}/connectionGroups/${conGroupName}?` + new URLSearchParams({
+                    'token': token
+                })).then((res) => res.json());
+                return group;   
             },
-            create() :Promise<any>
+            async create() :Promise<any>
             {
-                return new Promise((resolve,reject) => {reject('because')});
+                let { token, dataSource } = await getToken();
+
+                let group = await fetch(`${apiUrl}/session/data/${dataSource}/connectionGroups?` + new URLSearchParams({
+                    'token': token
+                }), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        "parentIdentifier": "ROOT",
+                        "name": name,
+                        "type": "ORGANIZATIONAL",
+                        "attributes": {
+                            "max-connections": "",
+                            "max-connections-per-user": "",
+                            "enable-session-affinity": ""
+                        }
+                    })
+                }).then((res) => res.json());
+                return group;
             },
-            delete() :Promise<any>
+            async delete() :Promise<any>
             {
-                return new Promise((resolve,reject) => {reject('because')});
+                let { token, dataSource } = await getToken();
+                let conGroupName = await resolveConnectionGroupName(name);
+
+                let group = await fetch(`${apiUrl}/session/data/${dataSource}/connectionGroups/${conGroupName}?` + new URLSearchParams({
+                    'token': token
+                }), {
+                    method: 'DELETE'
+                });
+                return group;
             }
         }
     }
