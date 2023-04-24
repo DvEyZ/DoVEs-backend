@@ -10,7 +10,7 @@ export class DockerMachine implements Machine
     name :string;
     type :string;
     address: string;
-    portRedirections: Array<{ inbound: number; outbound: number;  access: string | undefined}>;
+    portRedirections: Array<{ inbound: number; outbound: number;  access: string | undefined }>;
     supplement: object;
 
     constructor(container :Container)

@@ -11,7 +11,7 @@ interface GuacamoleServiceUser
 interface GuacamoleServiceConnection
 {
     get() :Promise<any>;
-    create(groupName :string, protocol :string, host :string, port :string) :Promise<any>;
+    create(groupName :string, protocol :string, host :string, port :number) :Promise<any>;
     delete() :Promise<any>;
 }
 
@@ -38,7 +38,7 @@ interface IGuacamoleService
 }
 
 
-class GuacamoleService implements IGuacamoleService 
+export class GuacamoleService implements IGuacamoleService
 {
     static apis :{
         [key: string] :{token :string, dataSource :string}
@@ -78,54 +78,237 @@ class GuacamoleService implements IGuacamoleService
         }
         let key = GuacamoleService.apis[this.apiUrl];
 
+        // check if key is valid, retry on 401.
+
         return key;
     }
 
-    // Methods have to retry on 401.
+    async #resolveConnectionName(connectionName :string) :Promise<any>
+    {
+
+    }
+
+    async #resolveConnectionGroupName(connectionName :string) :Promise<any>
+    {
+
+    }
 
     user(name :string) :GuacamoleServiceUser {
+        let apiUrl = this.apiUrl
+        let getToken = this.#getToken;
+        let resolveConnectionName = this.#resolveConnectionName;
+        let resolveConnectionGroupName = this.#resolveConnectionGroupName;
+
         return {
-            get() :Promise<any>
+            async get() :Promise<any>
             {
-                return new Promise((resolve,reject) => {reject('because')});
+                let { token, dataSource } = await getToken();
+                let user = await fetch(`${apiUrl}/session/data/${dataSource}/users/${name}?` + new URLSearchParams({
+                    'token': token
+                })).then((res) => res.json());
+
+                return user;
             },
-            create(password :string) :Promise<any>
+            async create(password :string) :Promise<any>
             {
-                return new Promise((resolve,reject) => {reject('because')});
+                let { token, dataSource } = await getToken();
+                let user = await fetch(`${apiUrl}/session/data/${dataSource}/users?` + new URLSearchParams({
+                    'token': token
+                }), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        "username": name,
+                        "password": password,
+                        "attributes": {
+                            "disabled": "",
+                            "expired": "",
+                            "access-window-start": "",
+                            "access-window-end": "",
+                            "valid-from": "",
+                            "valid-until": "",
+                            "timezone": null,
+                            "guac-full-name": "",
+                            "guac-organization": "",
+                            "guac-organizational-role": ""
+                        }
+                    })
+                }).then((res) => res.json());
+
+                return user;
             },
-            delete() :Promise<any>
+            async delete() :Promise<any>
             {
-                return new Promise((resolve,reject) => {reject('because')});
+                let { token, dataSource } = await getToken();
+                let user = await fetch(`${apiUrl}/session/data/${dataSource}/users/${name}?` + new URLSearchParams({
+                    'token': token
+                }), {
+                    method: 'DELETE'
+                });
+
+                return user;
             },
-            addConnection(connectionName :string) :Promise<any>
+            async addConnection(connectionName :string) :Promise<any>
             {
-                return new Promise((resolve,reject) => {reject('because')});
+                let { token, dataSource } = await getToken();
+                let connection = await resolveConnectionName(connectionName);
+
+                await fetch(`${apiUrl}/session/data/${dataSource}/users/${name}/permissions?` + new URLSearchParams({
+                    'token': token
+                }), {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify([
+                        {
+                            op: 'add',
+                            path: `/connectionPermissions/${connection}`,
+                            value: 'READ'
+                        }
+                    ])
+                });
             },
-            addConnectionGroup(connectionGroupName :string) :Promise<any>
+            async addConnectionGroup(connectionGroupName :string) :Promise<any>
             {
-                return new Promise((resolve,reject) => {reject('because')});
+                let { token, dataSource } = await getToken();
+                let connectionGroup = await resolveConnectionGroupName(connectionGroupName);
+
+                await fetch(`${apiUrl}/session/data/${dataSource}/users/${name}/permissions?` + new URLSearchParams({
+                    'token': token
+                }), {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify([
+                        {
+                            op: 'add',
+                            path: `/connectionGroupPermissions/${connectionGroup}`,
+                            value: 'READ'
+                        }
+                    ])
+                });
             },
-            addUserGroup(userGroupName :string) :Promise<any>
+            async addUserGroup(userGroupName :string) :Promise<any>
             {
-                return new Promise((resolve,reject) => {reject('because')});
+                let { token, dataSource } = await getToken();
+                await fetch(`${apiUrl}/session/data/${dataSource}/users/${name}/userGroups?` + new URLSearchParams({
+                    'token': token
+                }), {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify([
+                        {
+                            op: 'add',
+                            path: '/',
+                            value: userGroupName
+                        }
+                    ])
+                });
             }
         }
     }
 
     connection(name :string) :GuacamoleServiceConnection
     {
+        let apiUrl = this.apiUrl
+        let getToken = this.#getToken;
+        let resolveConnectionName = this.#resolveConnectionName;
         return {
-            get() :Promise<any>
+            async get() :Promise<any>
             {
-                return new Promise((resolve,reject) => {reject('because')});
+                let { token, dataSource } = await getToken();
+                let conName = resolveConnectionName(name);
+
+                let con = await fetch(`${apiUrl}/session/data/${dataSource}/connections/${conName}?` + new URLSearchParams({
+                    'token': token
+                })).then((res) => res.json());
+                return con;
             },
-            create(groupName :string, protocol :string, host :string, port :string) :Promise<any>
+            async create(groupName :string, protocol :string, host :string, port :number) :Promise<any>
             {
-                return new Promise((resolve,reject) => {reject('because')});
+                let { token, dataSource } = await getToken();
+
+                let con = await fetch(`${apiUrl}/session/data/${dataSource}/connections?` + new URLSearchParams({
+                    'token': token
+                }), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                            "parentIdentifier": groupName,
+                            "name": name,
+                            "protocol": protocol,
+                            "parameters": {
+                              "port": port,
+                              "read-only": "",
+                              "swap-red-blue": "",
+                              "cursor": "",
+                              "color-depth": "",
+                              "clipboard-encoding": "",
+                              "disable-copy": "",
+                              "disable-paste": "",
+                              "dest-port": "",
+                              "recording-exclude-output": "",
+                              "recording-exclude-mouse": "",
+                              "recording-include-keys": "",
+                              "create-recording-path": "",
+                              "enable-sftp": "",
+                              "sftp-port": "",
+                              "sftp-server-alive-interval": "",
+                              "enable-audio": "",
+                              "color-scheme": "",
+                              "font-size": "",
+                              "scrollback": "",
+                              "timezone": null,
+                              "server-alive-interval": "",
+                              "backspace": "",
+                              "terminal-type": "",
+                              "create-typescript-path": "",
+                              "hostname": host,
+                              "host-key": "",
+                              "private-key": "",
+                              "username": "",
+                              "password": "",
+                              "passphrase": "",
+                              "font-name": "",
+                              "command": "",
+                              "locale": "",
+                              "typescript-path": "",
+                              "typescript-name": "",
+                              "recording-path": "",
+                              "recording-name": "",
+                              "sftp-root-directory": ""
+                            },
+                            "attributes": {
+                              "max-connections": "",
+                              "max-connections-per-user": "",
+                              "weight": "",
+                              "failover-only": "",
+                              "guacd-port": "",
+                              "guacd-encryption": "",
+                              "guacd-hostname": ""
+                            }
+                    })
+                });
+                return con;
             },
-            delete() :Promise<any>
+            async delete() :Promise<any>
             {
-                return new Promise((resolve,reject) => {reject('because')});
+                let { token, dataSource } = await getToken();
+                let conName = resolveConnectionName(name);
+
+                let con = await fetch(`${apiUrl}/session/data/${dataSource}/connections/${conName}?` + new URLSearchParams({
+                    'token': token
+                }), {
+                    method: 'DELETE'
+                });
+                return name;
             }
         }
     }
