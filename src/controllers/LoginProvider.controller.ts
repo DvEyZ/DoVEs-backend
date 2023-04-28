@@ -1,5 +1,6 @@
 import { Request,Response } from "express";
 import { LoginProviderModel } from "../models/LoginProviders/LoginProvider.model";
+import { LoginProviderFactory } from "../models/factories/LoginProviderFactory.model";
 
 const LoginProviderController = {
     async list(req :Request, res :Response)
@@ -37,7 +38,24 @@ const LoginProviderController = {
             ))
                 return res.json({message: 'Missing properties.'}).status(422);
 
-            // TODO
+            let model = LoginProviderFactory(req.body.type);
+
+            if(!model)
+                return res.json({message: 'Invalid login provider type.'}).status(422);
+
+            let newProvider = await model.create({
+                _id: req.body.name,
+                type: req.body.type,
+                config: req.body.config
+            });
+
+            let provider = await newProvider.save();
+
+            return res.json({
+                name: provider._id,
+                type: provider.type,
+                config: provider.config,
+            }).status(201);
         }
         catch(e)
         {
@@ -52,7 +70,16 @@ const LoginProviderController = {
     {
         try
         {
-            // TODO
+            let provider = await LoginProviderModel.findById(req.params.provider);
+
+            if(!provider)
+                return res.json({message: 'Not found'}).status(404);
+
+            return res.json({
+                name: provider._id,
+                type: provider.type,
+                config: provider.config,
+            }).status(200);
         }
         catch(e)
         {
@@ -67,7 +94,27 @@ const LoginProviderController = {
     {
         try
         {
-            // TODO
+            if(!(
+                'name' in req.body && 
+                'type' in req.body && 
+                'config' in req.body
+            ))
+                return res.json({message: 'Missing properties.'}).status(422);
+
+            let newProvider = await LoginProviderModel.findById(req.params.provider);
+
+            if(!newProvider)
+                return res.json({message: 'Not found'}).status(404);
+
+            newProvider.config = req.body.config;
+
+            let provider = await newProvider.save();
+
+            return res.json({
+                name: provider._id,
+                type: provider.type,
+                config: provider.config,
+            }).status(200);
         }
         catch(e)
         {
@@ -82,7 +129,16 @@ const LoginProviderController = {
     {
         try
         {
-            // TODO
+            let provider = await LoginProviderModel.findByIdAndDelete(req.params.provider);
+
+            if(!provider)
+                return res.json({message: 'Not found'}).status(404);
+
+            return res.json({
+                name: provider._id,
+                type: provider.type,
+                config: provider.config,
+            }).status(200);
         }
         catch(e)
         {

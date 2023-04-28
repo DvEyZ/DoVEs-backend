@@ -22,6 +22,10 @@ export const GuacamoleLoginProviderSchema = new Schema({
     }
 });
 
+GuacamoleLoginProviderSchema.methods.testConnection = async function () :Promise<any> {
+    // TODO
+}
+
 GuacamoleLoginProviderSchema.methods.createEnvironment = async function (name :string, config :{}) :Promise<any> {
     let guacamole = new GuacamoleService(this.config.apiUrl, this.config.adminUsername, this.config.adminPassword);
     

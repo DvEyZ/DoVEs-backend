@@ -6,6 +6,8 @@ export interface LoginProvider
     type :string;
     config :any;
 
+    testConnection() :Promise<any>
+
     createEnvironment(name :string, config :any) :Promise<any>;
     createConnection(name :string, group :string, host :string, port :number, config :any) :Promise<any>;
 

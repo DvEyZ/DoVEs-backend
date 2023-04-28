@@ -1,4 +1,4 @@
-import { Model, Schema } from "mongoose";
+import { Model } from "mongoose";
 import { DockerLabModel } from "../docker/DockerLab.model";
 import { Lab } from "../Lab.model";
 
