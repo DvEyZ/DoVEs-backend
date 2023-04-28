@@ -74,7 +74,8 @@ const LabController = {
                         name: machine.name,
                         status: machine.status
                     }
-                })
+                }),
+                loginProviders: lab.loginProviders
             }).status(201);
         }
         catch(e)

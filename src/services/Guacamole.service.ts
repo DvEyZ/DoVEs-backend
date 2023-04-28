@@ -79,6 +79,12 @@ export class GuacamoleService implements IGuacamoleService
         let key = GuacamoleService.apis[this.apiUrl];
 
         // check if key is valid, retry on 401.
+        let v = await fetch(`${this.apiUrl}/session/data/users` + new URLSearchParams({
+            token: key.token
+        }));
+
+        if(!v.ok)
+            key = await this.#getToken();
 
         return key;
     }
@@ -145,7 +151,7 @@ export class GuacamoleService implements IGuacamoleService
                     'token': token
                 }), {
                     method: 'DELETE'
-                });
+                }).then((res) => res.json());
 
                 return user;
             },
@@ -295,7 +301,7 @@ export class GuacamoleService implements IGuacamoleService
                             "guacd-hostname": ""
                         }
                     })
-                });
+                }).then((res) => res.json());
                 return con;
             },
             async delete() :Promise<any>
@@ -307,7 +313,7 @@ export class GuacamoleService implements IGuacamoleService
                     'token': token
                 }), {
                     method: 'DELETE'
-                });
+                }).then((res) => res.json());
                 return con;
             }
         }
@@ -325,6 +331,7 @@ export class GuacamoleService implements IGuacamoleService
                 let group = await fetch(`${apiUrl}/session/data/${dataSource}/userGroups/${name}?` + new URLSearchParams({
                     'token': token
                 })).then((res) => res.json());
+
                 return group;
             },
             async create() :Promise<any>
@@ -355,7 +362,7 @@ export class GuacamoleService implements IGuacamoleService
                     'token': token
                 }), {
                     method: 'DELETE'
-                });
+                }).then((res) => res.json());
                 return group;
             }
         }
@@ -411,7 +418,7 @@ export class GuacamoleService implements IGuacamoleService
                     'token': token
                 }), {
                     method: 'DELETE'
-                });
+                }).then((res) => res.json());
                 return group;
             }
         }
