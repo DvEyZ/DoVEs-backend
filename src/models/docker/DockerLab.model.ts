@@ -1,9 +1,10 @@
 import { Schema } from "mongoose";
 import { Lab, LabModel } from "../Lab.model";
 import { Machine } from "../Machine.model";
-import dockerConnection from "../../services/Docker.service";
+import { dockerConnection, dockerComposeConnection } from "../../services/Docker.service";
 import { Container } from "node-docker-api/lib/container";
 import { DockerMachine } from "./DockerMachine.model";
+import YAML from 'yaml';
 
 const DockerLabSchema = new Schema({});
 
@@ -45,12 +46,16 @@ DockerLabSchema.methods.restart = async function () :Promise<any> {
     // docker-compose restart
 }
 
-DockerLabSchema.pre('save', function (next) {
-    if(!this.isNew) next();
+DockerLabSchema.pre('save', function (this :any, next) {
+    if(!this.isNew) return next();
     
-    // Create Docker lab (preferably via docker-compose)
+    let compose = YAML.parse(this.template.compose);
+    
+    
 
-    next();
+    dockerComposeConnection.createLab(String(this._id), YAML.stringify(compose));
+
+    return next();
 })
 
 DockerLabSchema.pre('deleteOne', {document:true,query:false}, function (next) {

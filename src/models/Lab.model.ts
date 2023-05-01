@@ -1,12 +1,13 @@
 import mongoose, { Document, Mongoose, Schema } from "mongoose";
 import { Machine } from "./Machine.model";
 import { LoginProvider } from "./LoginProviders/LoginProvider.model";
+import { Template } from "./Template.model";
 
 export interface Lab
 {
     _id :string;
     type :string;
-    template :string;
+    template :Template;
     portPrefix :number;
     machineCount :number;
     loginProviders :LoginProvider[];
@@ -21,7 +22,7 @@ export interface Lab
 
 export const LabSchema = new Schema({
     _id: {type: String, required: true},
-    template: {type: String, required: true},
+    template: {type: {type: Schema.Types.ObjectId, ref: 'Template'}, required: true},
     portPrefix: {type :Number, required: true, min: 1, max: 5},
     machineCount: {type: Number, required: true},
     loginProviders: {type: [{type: Schema.Types.ObjectId, ref: 'LoginProvider'}], required: true}

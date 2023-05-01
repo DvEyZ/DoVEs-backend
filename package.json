@@ -17,6 +17,7 @@
     "mongoose": "^7.0.3",
     "morgan": "~1.9.1",
     "node-docker-api": "^1.1.22",
+    "node-ssh": "^13.1.0",
     "yaml": "^2.2.1"
   },
   "devDependencies": {
