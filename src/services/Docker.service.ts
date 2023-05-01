@@ -15,9 +15,7 @@ interface IDockerComposeConnection
 class DockerComposeLocalConnection implements IDockerComposeConnection
 {
     constructor(private options :any)
-    {
-        
-    }
+    {}
 
     async createLab(name: string, compose: string) :Promise<any> 
     {
@@ -27,8 +25,7 @@ class DockerComposeLocalConnection implements IDockerComposeConnection
             fs.writeFileSync(`${this.options.labPath}/${name}/docker-compose.yml`, Buffer.from(compose));
             // Create lab
             exec(`${this.options.createScript}`, {cwd: `${this.options.labPath}/${name}`}, (error, stdout, stderr) => {
-                if(error)
-                    reject(error);
+                if(error) reject(error);
                 resolve(`${name}`);
             })
         })
@@ -36,7 +33,15 @@ class DockerComposeLocalConnection implements IDockerComposeConnection
 
     async tearDownLab(name: string) :Promise<any> 
     {
-        
+        return new Promise((resolve, reject) => {
+            exec(`${this.options.tearDownScript}`, {cwd: `${this.options.labPath}/${name}`}, (error, stdout, stderr) => {
+                if(error) reject(error);
+
+                fs.rmdirSync(`${this.options.labPath}/${name}`);
+                resolve(`${name}`)
+            })
+        })
+        // Delete directory
     }
 }
 
