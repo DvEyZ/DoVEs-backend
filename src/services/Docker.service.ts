@@ -4,7 +4,7 @@ import { NodeSSH } from 'node-ssh';
 import fs from 'node:fs';
 import { exec } from 'node:child_process';
 
-export const dockerConnection = new Docker(DockerConfig.api);
+export const dockerConnection = () => new Docker(DockerConfig.api);
 
 interface IDockerComposeConnection
 {
@@ -41,7 +41,6 @@ class DockerComposeLocalConnection implements IDockerComposeConnection
                 resolve(`${name}`)
             })
         })
-        // Delete directory
     }
 }
 
@@ -59,12 +58,45 @@ class DockerComposeSSHConnection implements IDockerComposeConnection
 
     async createLab(name: string, compose: string) :Promise<any> 
     {
-        
+        return new Promise((resolve, reject) => {
+            const ssh = new NodeSSH();
+            ssh.connect({
+                host: this.options.host,
+                port: this.options.port,
+                username: this.options.user,
+                privateKey: this.options.key
+            }).then(() => {
+                ssh.mkdir(`${this.options.labPath}/${name}`).then(() => {
+                    ssh.exec('tee', [`docker-compose.yml`], {cwd: `${this.options.labPath}/${name}`, stdin: compose}).then(() => {
+                        ssh.execCommand(`${this.options.createScript}`, {cwd: `${this.options.labPath}/${name}`}).then((result) => {
+                            if(result.code !== 0) reject(result.stderr);
+                            resolve(`${name}`);
+                        });
+                    })
+                });
+            });
+        });
     }
 
     async tearDownLab(name: string) :Promise<any> 
     {
-        
+        return new Promise((resolve, reject) => {
+            const ssh = new NodeSSH();
+            ssh.connect({
+                host: this.options.host,
+                port: this.options.port,
+                username: this.options.user,
+                privateKey: this.options.key
+            }).then(() => {
+                ssh.execCommand(`${this.options.tearDownScript}`, {cwd: `${this.options.labPath}/${name}`}).then((result) => {
+                    if(result.code !== 0) reject(result.stderr);
+                    ssh.execCommand(`rmdir ${this.options.labPath}/${name}`).then((result) => {
+                        if(result.code !== 0) reject(result.stderr);
+                        resolve(`${name}`);
+                    })
+                })
+            });
+        });
     }
 }
 
@@ -82,5 +114,5 @@ const DockerComposeConnectionFactory = (type :string, options :any) :IDockerComp
     throw new Error('Invalid Docker connection type.')
 }
 
-export const dockerComposeConnection = DockerComposeConnectionFactory(DockerConfig.via, DockerConfig.compose);
+export const dockerComposeConnection = () => DockerComposeConnectionFactory(DockerConfig.via, DockerConfig.compose);
     

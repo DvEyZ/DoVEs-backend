@@ -12,7 +12,7 @@ const DockerLabSchema = new Schema({});
 DockerLabSchema.methods.getMachines = async function () :Promise<Array<Machine>> {
     // Fetch all machines from the lab
     return new Promise((resolve, reject) => {
-        dockerConnection.container.list({filters: {label: [
+        dockerConnection().container.list({filters: {label: [
             `com.docker.compose.project=${this.name}`
         ]}}).then((containers :Array<Container>) => {
             resolve(containers.map((c :Container) :Machine => new DockerMachine(c)));
@@ -23,7 +23,7 @@ DockerLabSchema.methods.getMachines = async function () :Promise<Array<Machine>>
 DockerLabSchema.methods.getMachine = async function (name :string) :Promise<Machine> {
     // Fetch one machine from the lab 
     return new Promise((resolve, reject) => {
-        dockerConnection.container.list({filters: {label: [
+        dockerConnection().container.list({filters: {label: [
             `com.docker.compose.project=${this.name}`,
             `com.docker.compose.service=${name}`
         ]}}).then((c :Array<Container>) => {
@@ -72,14 +72,14 @@ DockerLabSchema.pre('save', function (this :any, next) {
         }
     });
 
-    dockerComposeConnection.createLab(String(this._id), YAML.stringify(compose));
+    dockerComposeConnection().createLab(String(this._id), YAML.stringify(compose));
 
     return next();
 })
 
 DockerLabSchema.pre('deleteOne', {document:true,query:false}, function (next) {
     // Tear down Docker lab
-    dockerComposeConnection.tearDownLab(String(this._id));
+    dockerComposeConnection().tearDownLab(String(this._id));
 });
 
 export const DockerLabModel = LabModel.discriminator<Lab>('docker', DockerLabSchema);

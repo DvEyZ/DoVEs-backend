@@ -9,9 +9,7 @@ interface IDockerConfig
         host? :string,  // host of remote Docker socket, if via ssh
         port? :string,  // ssh port of remote Docker socket, if via ssh
         user? :string,  // ssh user, if via ssh
-        ca? :Buffer,    // ssh ca, if via ssh
-        cert? :Buffer,  // ssh cert, if via ssh
-        key? :Buffer    // ssh key, if via ssh
+        sshOptions? :any    // ssh key, if via ssh
     } | undefined,
 
     compose :{
@@ -21,8 +19,6 @@ interface IDockerConfig
         host? :string,  // host of remote Docker socket, if via ssh
         port? :string,  // ssh port of remote Docker socket, if via ssh
         user? :string,  // ssh user, if via ssh
-        ca? :Buffer,    // ssh ca, if via ssh
-        cert? :Buffer,  // ssh cert, if via ssh
         key? :Buffer    // ssh key, if via ssh       
     } | undefined,
 
@@ -39,9 +35,9 @@ const DockerConfig :IDockerConfig = {
         host: process.env.DOCKER_SSH_HOST,
         port: process.env.DOCKER_SSH_PORT,
         user: process.env.DOCKER_SSH_USER,
-        ca: process.env.DOCKER_SSH_CA ? fs.readFileSync(process.env.DOCKER_SSH_CA) : undefined,
-        cert: process.env.DOCKER_SSH_CERT ? fs.readFileSync(process.env.DOCKER_SSH_CERT) : undefined,
-        key: process.env.DOCKER_SSH_KEY ? fs.readFileSync(process.env.DOCKER_SSH_KEY) : undefined
+        sshOptions: {
+            key: process.env.DOCKER_SSH_KEY ? fs.readFileSync(process.env.DOCKER_SSH_KEY) : undefined
+        }
     } : undefined,
 
     compose: {
@@ -53,8 +49,6 @@ const DockerConfig :IDockerConfig = {
             host: process.env.DOCKER_SSH_HOST,
             port: process.env.DOCKER_SSH_PORT,
             user: process.env.DOCKER_SSH_USER,
-            ca: process.env.DOCKER_SSH_CA ? fs.readFileSync(process.env.DOCKER_SSH_CA) : undefined,
-            cert: process.env.DOCKER_SSH_CERT ? fs.readFileSync(process.env.DOCKER_SSH_CERT) : undefined,
             key: process.env.DOCKER_SSH_KEY ? fs.readFileSync(process.env.DOCKER_SSH_KEY) : undefined
         } : {
         }),
