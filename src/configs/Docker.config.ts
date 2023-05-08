@@ -1,5 +1,7 @@
 import fs from 'node:fs';
 
+require('dotenv').config();
+
 interface IDockerConfig
 {
     via: string, // either 'local' or 'ssh'

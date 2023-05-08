@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { Lab, LabModel } from "../Lab.model";
 import { Machine } from "../Machine.model";
 import { dockerConnection, dockerComposeConnection } from "../../services/Docker.service";
@@ -82,4 +82,4 @@ DockerLabSchema.pre('deleteOne', {document:true,query:false}, function (next) {
     dockerComposeConnection().tearDownLab(String(this._id));
 });
 
-export const DockerLabModel = LabModel.discriminator<Lab>('docker', DockerLabSchema);
+export const DockerLabModel = LabModel.discriminator<Lab>('Lab:docker', DockerLabSchema, 'docker');

@@ -22,10 +22,10 @@ export interface Lab
 
 export const LabSchema = new Schema({
     _id: {type: String, required: true},
-    template: {type: {type: Schema.Types.ObjectId, ref: 'Template'}, required: true},
+    template: {type: Schema.Types.ObjectId, ref: 'Template', required: true},
     portPrefix: {type :Number, required: true, min: 1, max: 5},
     machineCount: {type: Number, required: true},
-    loginProviders: {type: [{type: Schema.Types.ObjectId, ref: 'LoginProvider'}], required: true}
+    loginProviders: {type: [Schema.Types.ObjectId], ref: 'LoginProvider', required: true}
 }, {discriminatorKey: 'type'});
 
 LabSchema.post('save', async function (doc, next) {

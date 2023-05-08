@@ -1,5 +1,5 @@
 import { Template, TemplateModel } from "../Template.model";
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 export interface DockerTemplate extends Template
 {
@@ -10,4 +10,4 @@ export interface DockerTemplate extends Template
 
 const DockerTemplateSchema = new Schema({})
 
-export const DockerTemplateModel = TemplateModel.discriminator<DockerTemplate>('docker', DockerTemplateSchema);
+export const DockerTemplateModel = TemplateModel.discriminator<DockerTemplate>('Template:docker', DockerTemplateSchema, 'docker');
