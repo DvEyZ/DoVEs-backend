@@ -1,5 +1,5 @@
 const MongoDBConfig = {
-    uri: process.env.MONGO_URI
+    uri: process.env.MONGO_URI!
 }
 
 export default MongoDBConfig;

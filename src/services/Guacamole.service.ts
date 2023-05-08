@@ -31,6 +31,7 @@ interface GuacamoleServiceConnectionGroup
 
 interface IGuacamoleService
 {
+    check() :Promise<any>;
     user(name :string) :GuacamoleServiceUser;
     connection(name :string) :GuacamoleServiceConnection;
     userGroup(name :string) :GuacamoleServiceUserGroup;
@@ -79,12 +80,17 @@ export class GuacamoleService implements IGuacamoleService
         let key = GuacamoleService.apis[this.apiUrl];
 
         // check if key is valid, retry on 401.
-        let v = await fetch(`${this.apiUrl}/session/data/users` + new URLSearchParams({
+        let v = await fetch(`${this.apiUrl}/session/data/${key.dataSource}/users` + new URLSearchParams({
             token: key.token
         }));
 
-        if(!v.ok)
-            key = await this.#getToken();
+        if(v.status === 401)
+        {
+            key = await this.#requireNewToken().then((res) => res.json()).then((json) => {return {
+                token: json.authToken,
+                dataSource: json.dataSource,
+            }});
+        }
 
         return key;
     }
@@ -92,11 +98,21 @@ export class GuacamoleService implements IGuacamoleService
     async #resolveConnectionName(connectionName :string) :Promise<any>
     {
         // todo
+        // Jezu Chryste jak mi sie tego robic nie chceeeeeee 
     }
 
     async #resolveConnectionGroupName(connectionName :string) :Promise<any>
     {
         // todo
+    }
+
+    async check() :Promise<any>
+    {
+        let { token, dataSource } = await this.#getToken();
+
+        await fetch(`${this.apiUrl}/session/data/${dataSource}/users` + new URLSearchParams({
+            token: token
+        }));
     }
 
     user(name :string) :GuacamoleServiceUser {
