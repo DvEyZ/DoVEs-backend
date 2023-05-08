@@ -80,7 +80,7 @@ export class GuacamoleService implements IGuacamoleService
         let key = GuacamoleService.apis[this.apiUrl];
 
         // check if key is valid, retry on 401.
-        let v = await fetch(`${this.apiUrl}/session/data/${key.dataSource}/users` + new URLSearchParams({
+        let v = await fetch(`${this.apiUrl}/session/data/${key.dataSource}/users?` + new URLSearchParams({
             token: key.token
         }));
 
@@ -95,22 +95,33 @@ export class GuacamoleService implements IGuacamoleService
         return key;
     }
 
-    async #resolveConnectionName(connectionName :string) :Promise<any>
+    async #resolveConnectionName(connectionName :string) :Promise<string>
     {
-        // todo
-        // Jezu Chryste jak mi sie tego robic nie chceeeeeee 
+        let { token, dataSource } = await this.#getToken();
+        let cons = await fetch(`${this.apiUrl}/session/data/${dataSource}/connections?` + new URLSearchParams({
+            token: token
+        })).then((res) => res.json());
+
+        let a :any = Object.values(cons).filter((v :any) => v.name === connectionName)[0];
+        return a.identifier;
     }
 
-    async #resolveConnectionGroupName(connectionName :string) :Promise<any>
+    async #resolveConnectionGroupName(connectionName :string) :Promise<string>
     {
-        // todo
+        let { token, dataSource } = await this.#getToken();
+        let cons = await fetch(`${this.apiUrl}/session/data/${dataSource}/connectionGroups?` + new URLSearchParams({
+            token: token
+        })).then((res) => res.json());
+
+        let a :any = Object.values(cons).filter((v :any) => v.name === connectionName)[0];
+        return a.identifier;
     }
 
     async check() :Promise<any>
     {
         let { token, dataSource } = await this.#getToken();
 
-        await fetch(`${this.apiUrl}/session/data/${dataSource}/users` + new URLSearchParams({
+        await fetch(`${this.apiUrl}/session/data/${dataSource}/users?` + new URLSearchParams({
             token: token
         }));
     }

@@ -4,6 +4,7 @@ import logger from 'morgan';
 import express, { Express, Request, Response } from 'express'
 import labsRouter from './src/routes/Labs.routes';
 import templateRouter from './src/routes/Templates.routes';
+import loginProviderRouter from './src/routes/LoginProviders.routes';
 import { connectDb } from './src/services/MongoDB.service';
 
 var app :Express = express();
@@ -15,6 +16,7 @@ app.use(cookieParser());
 
 app.use('/labs', labsRouter);
 app.use('/templates', templateRouter);
+app.use('/loginProviders', loginProviderRouter);
 
 app.use((req :Request, res :Response, next :any) => {
     next(createError(404));
