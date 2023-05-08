@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { LabModel } from '../models/Lab.model';
+import { ApiError } from '../utils/ApiError';
 
 const MachineController = {
     async list(req :Request, res :Response)
@@ -23,7 +24,11 @@ const MachineController = {
         }
         catch(e)
         {
-            // Error handling
+            let message = 'Internal server error';
+            let status = 500;
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
+            return res.json({message: message}).status(status);
         }
     },
     
@@ -45,7 +50,11 @@ const MachineController = {
         }
         catch(e)
         {
-            // Error handling
+            let message = 'Internal server error';
+            let status = 500;
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
+            return res.json({message: message}).status(status);
         }
     },
     
@@ -88,7 +97,11 @@ const MachineController = {
         }
         catch(e)
         {
-            // Error handling
+            let message = 'Internal server error';
+            let status = 500;
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
+            return res.json({message: message}).status(status);
         }
     }, 
 }

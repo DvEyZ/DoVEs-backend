@@ -1,15 +1,14 @@
 import { Request, Response } from 'express';
 import { Lab, LabModel } from '../models/Lab.model';
 import { LabFactory } from '../models/factories/LabFactory.model';
+import { ApiError } from '../utils/ApiError';
 
 const getUpStatus = async(lab :Lab) :Promise<Number> =>
 {
     return lab.getMachines().then((machines) => {
         let run = machines.filter((v) => v.status == 'running')
         return Number((run.length / machines.length).toPrecision(2)) * 100
-    }).catch((e) => {
-        throw new Error(e)
-    });
+    })
 }
 
 const LabController = {
@@ -32,7 +31,8 @@ const LabController = {
         {
             let message = 'Internal server error';
             let status = 500;
-
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
             return res.json({message: message}).status(status);
         }
     },
@@ -82,7 +82,8 @@ const LabController = {
         {
             let message = 'Internal server error';
             let status = 500;
-
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
             return res.json({message: message}).status(status);
         }
     },
@@ -117,7 +118,7 @@ const LabController = {
             let message = 'Internal server error';
             let status = 500;
             if(e instanceof Error) message = e.message;
-            if(e instanceof TypeError) status = 400;
+            if(e instanceof ApiError) status = e.status;
             return res.json({message: message}).status(status);
         }
     },
@@ -167,7 +168,8 @@ const LabController = {
         {
             let message = 'Internal server error';
             let status = 500;
-
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
             return res.json({message: message}).status(status);
         }
     }, 
@@ -193,7 +195,8 @@ const LabController = {
         {
             let message = 'Internal server error';
             let status = 500;
-
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
             return res.json({message: message}).status(status);
         }
     }

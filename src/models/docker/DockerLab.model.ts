@@ -6,6 +6,7 @@ import { Container } from "node-docker-api/lib/container";
 import { DockerMachine } from "./DockerMachine.model";
 import YAML from 'yaml';
 import { MachineDefinition } from "../Template.model";
+import { ApiError } from "../../utils/ApiError";
 
 const DockerLabSchema = new Schema({});
 
@@ -61,7 +62,7 @@ DockerLabSchema.pre('save', function (this :any, next) {
 
         for(let i = 0; i < this.machineCount; i++)
         {
-            if(i > 99) throw new Error('Number out of range.');
+            if(i > 99) throw new ApiError(422, 'Number out of range.');
 
             compose[`${v.name}_${i}`] = {
                 ...machine,

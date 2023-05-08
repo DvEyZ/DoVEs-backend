@@ -1,6 +1,7 @@
 import { Request,Response } from "express";
 import { LoginProviderModel } from "../models/LoginProviders/LoginProvider.model";
 import { LoginProviderFactory } from "../models/factories/LoginProviderFactory.model";
+import { ApiError } from "../utils/ApiError";
 
 const LoginProviderController = {
     async list(req :Request, res :Response)
@@ -22,7 +23,8 @@ const LoginProviderController = {
         {
             let message = 'Internal server error';
             let status = 500;
-
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
             return res.json({message: message}).status(status);
         }
     },
@@ -61,7 +63,8 @@ const LoginProviderController = {
         {
             let message = 'Internal server error';
             let status = 500;
-
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
             return res.json({message: message}).status(status);
         }
     },
@@ -85,7 +88,8 @@ const LoginProviderController = {
         {
             let message = 'Internal server error';
             let status = 500;
-
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
             return res.json({message: message}).status(status);
         }
     },
@@ -120,7 +124,8 @@ const LoginProviderController = {
         {
             let message = 'Internal server error';
             let status = 500;
-
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
             return res.json({message: message}).status(status);
         }
     },
@@ -144,7 +149,8 @@ const LoginProviderController = {
         {
             let message = 'Internal server error';
             let status = 500;
-
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
             return res.json({message: message}).status(status);
         }
     }

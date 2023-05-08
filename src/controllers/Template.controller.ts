@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { TemplateModel } from '../models/Template.model';
 import { TemplateFactory } from '../models/factories/TemplateFactory.model';
+import { ApiError } from '../utils/ApiError';
 
 const TemplateController = {
     async list(req :Request, res :Response)
@@ -22,7 +23,8 @@ const TemplateController = {
         {
             let message = 'Internal server error';
             let status = 500;
-
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
             return res.json({message: message}).status(status);
         }
     },
@@ -62,7 +64,8 @@ const TemplateController = {
         {
             let message = 'Internal server error';
             let status = 500;
-
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
             return res.json({message: message}).status(status);
         }
     },
@@ -87,7 +90,8 @@ const TemplateController = {
         {
             let message = 'Internal server error';
             let status = 500;
-
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
             return res.json({message: message}).status(status);
         }
     },
@@ -124,7 +128,8 @@ const TemplateController = {
         {
             let message = 'Internal server error';
             let status = 500;
-
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
             return res.json({message: message}).status(status);
         }
     },
@@ -149,7 +154,8 @@ const TemplateController = {
         {
             let message = 'Internal server error';
             let status = 500;
-
+            if(e instanceof Error) message = e.message;
+            if(e instanceof ApiError) status = e.status;
             return res.json({message: message}).status(status);
         }
     }, 

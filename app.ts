@@ -31,9 +31,10 @@ app.use((err :ExpressError, req :Request, res :Response, next :any) => {
     res.status(err.status || 500).send({error: err.message});
 });
 
-connectDb();
+connectDb().then(() => {
+    app.listen(3001, () => {
+        console.log('Listening on http://localhost:3001')
+    })
+}).catch((e) => {console.error(e)});
 
-app.listen(3001, () => {
-    console.log('Listening on http://localhost:3001')
-})
 module.exports = app;
