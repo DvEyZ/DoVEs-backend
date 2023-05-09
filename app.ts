@@ -2,9 +2,12 @@ import createError from 'http-errors';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import express, { Express, Request, Response } from 'express'
+
+import aboutRouter from './src/routes/About.routes'
 import labsRouter from './src/routes/Labs.routes';
 import templateRouter from './src/routes/Templates.routes';
 import loginProviderRouter from './src/routes/LoginProviders.routes';
+
 import { connectDb } from './src/services/MongoDB.service';
 import cors from 'cors';
 
@@ -15,6 +18,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(cors())
+
+app.use('/about', aboutRouter);
 
 app.use('/labs', labsRouter);
 app.use('/templates', templateRouter);
