@@ -17,7 +17,7 @@ const LabController = {
         try
         {
             let labs = await LabModel.find();
-            return res.json({
+            return res.status(200).json({
                 labs: labs.map(async (lab) => {
                     return {
                         name: lab._id,
@@ -25,7 +25,7 @@ const LabController = {
                         up: await getUpStatus(lab),
                     }
                 })
-            }).status(200);
+            });
         }
         catch(e)
         {
@@ -33,7 +33,7 @@ const LabController = {
             let status = 500;
             if(e instanceof Error) message = e.message;
             if(e instanceof ApiError) status = e.status;
-            return res.json({message: message}).status(status);
+            return res.status(status).json({message: message});
         }
     },
 
@@ -49,12 +49,12 @@ const LabController = {
                 'machineCount' in req.body &&
                 'loginProviders' in req.body
             ))
-                return res.json({message: 'Missing properties.'}).status(422);
+                return res.status(422).json({message: 'Missing properties.'});
 
             let model = LabFactory(req.body.type);
 
             if(!model)
-                return res.json({message: 'Invalid lab type.'}).status(422);
+                return res.status(422).json({message: 'Invalid lab type.'});
 
             let lab :Lab = await model.create({
                 _id: req.body.name,
@@ -64,7 +64,7 @@ const LabController = {
                 loginProviders: req.body.loginProviders
             });
             
-            return res.json({
+            return res.status(201).json({
                 name: lab._id,
                 type: lab.type,
                 up: await getUpStatus(lab),
@@ -76,7 +76,7 @@ const LabController = {
                     }
                 }),
                 loginProviders: lab.loginProviders
-            }).status(201);
+            });
         }
         catch(e)
         {
@@ -84,7 +84,7 @@ const LabController = {
             let status = 500;
             if(e instanceof Error) message = e.message;
             if(e instanceof ApiError) status = e.status;
-            return res.json({message: message}).status(status);
+            return res.status(status).json({message: message});
         }
     },
     
@@ -95,10 +95,10 @@ const LabController = {
             let lab = await LabModel.findById(req.params.lab).populate('loginProviders');
             if(!lab) 
             {
-                return res.json({message: 'Not found'}).status(404);
+                return res.status(404).json({message: 'Not found'});
             }
 
-            res.json({
+            res.status(201).json({
                 name: lab._id,
                 type: lab.type,
                 up: await getUpStatus(lab),
@@ -111,7 +111,7 @@ const LabController = {
                 }),
                 loginProviders: lab.loginProviders
 
-            }).status(201);
+            });
         }
         catch(e)
         {
@@ -119,7 +119,7 @@ const LabController = {
             let status = 500;
             if(e instanceof Error) message = e.message;
             if(e instanceof ApiError) status = e.status;
-            return res.json({message: message}).status(status);
+            return res.status(status).json({message: message});
         }
     },
     
@@ -130,11 +130,11 @@ const LabController = {
             if(!(
                 'op' in req.body
             ))
-                return res.json({message: 'Missing properties.'}).status(422);
+                return res.status(422).json({message: 'Missing properties.'});
             
             let lab = await LabModel.findById(req.params.lab);
             if(!lab) 
-                return res.json({message: 'Not found'}).status(404);
+                return res.status(404).json({message: 'Not found'});
 
             let op = req.body.action;
 
@@ -146,11 +146,11 @@ const LabController = {
             else if(op == 'restart')
                 await lab.restart();
             else
-                return res.json({message: 'Invalid operation'}).status(400);
+                return res.status(400).json({message: 'Invalid operation'});
             
             let nLab = await LabModel.findById(req.params.lab).populate('loginProviders');
 
-            return res.json({
+            return res.status(201).json({
                 name: nLab!._id,
                 type: nLab!.type,
                 up: await getUpStatus(nLab!),
@@ -162,7 +162,7 @@ const LabController = {
                     }
                 }),
                 loginProviders: nLab!.loginProviders
-            }).status(201);
+            });
         }
         catch(e)
         {
@@ -170,7 +170,7 @@ const LabController = {
             let status = 500;
             if(e instanceof Error) message = e.message;
             if(e instanceof ApiError) status = e.status;
-            return res.json({message: message}).status(status);
+            return res.status(status).json({message: message});
         }
     }, 
     
@@ -182,14 +182,14 @@ const LabController = {
 
             if(!lab)
             {
-                return res.json({message: 'Not found'}).status(404)
+                return res.status(404).json({message: 'Not found'})
             }
 
-            return res.json({
+            return res.status(200).json({
                 name: lab._id,
                 type: lab.type,
                 template: lab.template
-            }).status(200);
+            });
         }
         catch(e)
         {
@@ -197,7 +197,7 @@ const LabController = {
             let status = 500;
             if(e instanceof Error) message = e.message;
             if(e instanceof ApiError) status = e.status;
-            return res.json({message: message}).status(status);
+            return res.status(status).json({message: message});
         }
     }
 }

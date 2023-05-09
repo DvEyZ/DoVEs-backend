@@ -6,6 +6,7 @@ import labsRouter from './src/routes/Labs.routes';
 import templateRouter from './src/routes/Templates.routes';
 import loginProviderRouter from './src/routes/LoginProviders.routes';
 import { connectDb } from './src/services/MongoDB.service';
+import cors from 'cors';
 
 var app :Express = express();
 
@@ -13,6 +14,7 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cors())
 
 app.use('/labs', labsRouter);
 app.use('/templates', templateRouter);

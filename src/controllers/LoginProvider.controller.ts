@@ -10,14 +10,14 @@ const LoginProviderController = {
         {
             let providers = await LoginProviderModel.find();
 
-            return res.json({
+            return res.status(200).json({
                 loginProviders: providers.map((v) => {
                     return {
                         name: v._id,
                         type: v.type,
                     }
                 })
-            }).status(200);
+            });
         }
         catch(e)
         {
@@ -33,18 +33,20 @@ const LoginProviderController = {
     {
         try
         {
-            console.log(req.body);
             if(!(
                 'name' in req.body && 
                 'type' in req.body && 
                 'config' in req.body
             ))
-                return res.json({message: 'Missing properties.'}).status(422);
+                return res.status(422).json({message: 'Missing properties.'});
+
+            if(await LoginProviderModel.findById(req.body.name))
+                return res.status(409).json({message: `Login provider "${req.body.name} already exists`})
 
             let model = LoginProviderFactory(req.body.type);
 
             if(!model)
-                return res.json({message: 'Invalid login provider type.'}).status(422);
+                return res.status(422).json({message: 'Invalid login provider type.'});
 
             let newProvider = await model.create({
                 _id: req.body.name,
@@ -54,11 +56,11 @@ const LoginProviderController = {
 
             let provider = await newProvider.save();
 
-            return res.json({
+            return res.status(201).json({
                 name: provider._id,
                 type: provider.type,
                 config: provider.config,
-            }).status(201);
+            });
         }
         catch(e)
         {
@@ -66,7 +68,7 @@ const LoginProviderController = {
             let status = 500;
             if(e instanceof Error) message = e.message;
             if(e instanceof ApiError) status = e.status;
-            return res.json({message: message}).status(status);
+            return res.status(status).json({message: message});
         }
     },
 
@@ -77,13 +79,13 @@ const LoginProviderController = {
             let provider = await LoginProviderModel.findById(req.params.provider);
 
             if(!provider)
-                return res.json({message: 'Not found'}).status(404);
+                return res.status(404).json({message: 'Not found'})
 
-            return res.json({
+            return res.status(200).json({
                 name: provider._id,
                 type: provider.type,
                 config: provider.config,
-            }).status(200);
+            });
         }
         catch(e)
         {
@@ -104,22 +106,22 @@ const LoginProviderController = {
                 'type' in req.body && 
                 'config' in req.body
             ))
-                return res.json({message: 'Missing properties.'}).status(422);
+                return res.status(422).json({message: 'Missing properties.'});
 
             let newProvider = await LoginProviderModel.findById(req.params.provider);
 
             if(!newProvider)
-                return res.json({message: 'Not found'}).status(404);
+                return res.status(404).json({message: 'Not found'});
 
             newProvider.config = req.body.config;
 
             let provider = await newProvider.save();
 
-            return res.json({
+            return res.status(200).json({
                 name: provider._id,
                 type: provider.type,
                 config: provider.config,
-            }).status(200);
+            });
         }
         catch(e)
         {
@@ -138,13 +140,13 @@ const LoginProviderController = {
             let provider = await LoginProviderModel.findByIdAndDelete(req.params.provider);
 
             if(!provider)
-                return res.json({message: 'Not found'}).status(404);
+                return res.status(404).json({message: 'Not found'});
 
-            return res.json({
+            return res.status(200).json({
                 name: provider._id,
                 type: provider.type,
                 config: provider.config,
-            }).status(200);
+            });
         }
         catch(e)
         {
@@ -152,7 +154,7 @@ const LoginProviderController = {
             let status = 500;
             if(e instanceof Error) message = e.message;
             if(e instanceof ApiError) status = e.status;
-            return res.json({message: message}).status(status);
+            return res.status(status).json({message: message});
         }
     }
 }

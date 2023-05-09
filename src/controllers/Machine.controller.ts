@@ -9,18 +9,18 @@ const MachineController = {
         {
             let lab = await LabModel.findById(req.params.lab);
             if(!lab)
-                return res.json({message: 'Not found'}).status(404);
+                return res.status(404).json({message: 'Not found'});
 
             let m = await lab.getMachines();
 
-            return res.json({
+            return res.status(200).json({
                 machines: m.map((v) => {
                     return {
                         name: v.name,
                         status: v.status,   
                     }
                 })
-            }).status(200)
+            })
         }
         catch(e)
         {
@@ -28,7 +28,7 @@ const MachineController = {
             let status = 500;
             if(e instanceof Error) message = e.message;
             if(e instanceof ApiError) status = e.status;
-            return res.json({message: message}).status(status);
+            return res.status(status).json({message: message});
         }
     },
     
@@ -38,15 +38,15 @@ const MachineController = {
         {
             let lab = await LabModel.findById(req.params.lab);
             if(!lab)
-                return res.json({message: 'Not found'}).status(404);
+                return res.status(404).json({message: 'Not found'});
             
             let machine = await lab.getMachine(req.params.machine);
 
-            return res.json({
+            return res.status(200).json({
                 name: machine.name,
                 status: machine.status,
                 address: machine.address
-            }).status(200)
+            })
         }
         catch(e)
         {
@@ -54,7 +54,7 @@ const MachineController = {
             let status = 500;
             if(e instanceof Error) message = e.message;
             if(e instanceof ApiError) status = e.status;
-            return res.json({message: message}).status(status);
+            return res.status(status).json({message: message});
         }
     },
     
@@ -65,11 +65,11 @@ const MachineController = {
             if(!(
                 'op' in req.body
             ))
-                return res.json({message: 'Missing properties.'}).status(422);
+                return res.status(422).json({message: 'Missing properties.'});
 
             let lab = await LabModel.findById(req.params.lab);
             if(!lab)
-                return res.json({message: 'Not found'}).status(404);
+                return res.status(404).json({message: 'Not found'});
             
             let machine = await lab.getMachine(req.params.machine);
 
@@ -77,7 +77,7 @@ const MachineController = {
 
             if(!(['start','stop','restart'].includes(op)))
             {
-                return res.json({message: 'Invalid operation'}).status(400);
+                return res.status(400).json({message: 'Invalid operation'});
             }
             
             if(op === 'start')
@@ -89,11 +89,11 @@ const MachineController = {
 
             let newMachine = await lab.getMachine(req.params.machine);
 
-            return res.json({
+            return res.status(200).json({
                 name: newMachine.name,
                 status: newMachine.status,
                 address: newMachine.address
-            }).status(200);
+            });
         }
         catch(e)
         {
@@ -101,7 +101,7 @@ const MachineController = {
             let status = 500;
             if(e instanceof Error) message = e.message;
             if(e instanceof ApiError) status = e.status;
-            return res.json({message: message}).status(status);
+            return res.status(status).json({message: message});
         }
     }, 
 }

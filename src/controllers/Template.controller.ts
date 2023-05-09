@@ -10,14 +10,14 @@ const TemplateController = {
         {
             let templates = await TemplateModel.find();
 
-            return res.json({
+            return res.status(200).json({
                 templates: templates.map((v) => {
                     return {
                         name: v._id,
                         type: v.type
                     }
                 })
-            }).status(200);
+            });
         }
         catch(e)
         {
@@ -25,7 +25,7 @@ const TemplateController = {
             let status = 500;
             if(e instanceof Error) message = e.message;
             if(e instanceof ApiError) status = e.status;
-            return res.json({message: message}).status(status);
+            return res.status(status).json({message: message});
         }
     },
 
@@ -38,12 +38,12 @@ const TemplateController = {
                 'type' in req.body && 
                 'machineDefs' in req.body
             ))
-                return res.json({message: 'Missing properties.'}).status(422);
+                return res.status(422).json({message: 'Missing properties.'});
             
             let model = TemplateFactory(req.body.type);
 
             if(!model)
-                return res.json({message: 'Invalid template type'}).status(422); 
+                return res.status(422).json({message: 'Invalid template type'}); 
 
             let newTemplate = await model.create({
                 _id: req.body.name,
@@ -53,12 +53,12 @@ const TemplateController = {
 
             let template = await newTemplate.save();
 
-            return res.json({
+            return res.status(201).json({
                 name: template._id,
                 type: template.type,
                 machineDefs: template.machineDefs,
                 supplement: template.supplement
-            }).status(201);
+            });
         } 
         catch (e) 
         {
@@ -66,7 +66,7 @@ const TemplateController = {
             let status = 500;
             if(e instanceof Error) message = e.message;
             if(e instanceof ApiError) status = e.status;
-            return res.json({message: message}).status(status);
+            return res.status(status).json({message: message});
         }
     },
     
@@ -77,14 +77,14 @@ const TemplateController = {
             let template = await TemplateModel.findById(req.params.template);
 
             if(!template)
-                return res.json({message: 'Not found'}).status(404);
+                return res.status(404).json({message: 'Not found'});
             
-            return res.json({
+            return res.status(200).json({
                 name: template._id,
                 type: template.type,
                 machineDefs: template.machineDefs,
                 supplement: template.supplement
-            }).status(200)
+            })
         } 
         catch (e) 
         {
@@ -92,7 +92,7 @@ const TemplateController = {
             let status = 500;
             if(e instanceof Error) message = e.message;
             if(e instanceof ApiError) status = e.status;
-            return res.json({message: message}).status(status);
+            return res.status(status).json({message: message});
         }
     },
     
@@ -105,24 +105,24 @@ const TemplateController = {
                 'type' in req.body && 
                 'machineDefs' in req.body
             ))
-                return res.json({message: 'Missing properties.'}).status(422);
+                return res.status(422).json({message: 'Missing properties.'});
 
             let newTemplate = await TemplateModel.findById(req.body.name);
 
             if(!newTemplate)
-                return res.json({message: 'Not found'}).status(404);
+                return res.status(404).json({message: 'Not found'});
 
             newTemplate.machineDefs = req.body.machineDefs;
             newTemplate.supplement = req.body.supplement;
 
             let template = await newTemplate.save();
     
-            return res.json({
+            return res.status(201).json({
                 name: template._id,
                 type: template.type,
                 machineDefs: template.machineDefs,
                 supplement: template.supplement
-            }).status(201);
+            });
         } 
         catch (e) 
         {
@@ -130,7 +130,7 @@ const TemplateController = {
             let status = 500;
             if(e instanceof Error) message = e.message;
             if(e instanceof ApiError) status = e.status;
-            return res.json({message: message}).status(status);
+            return res.status(status).json({message: message})
         }
     },
 
@@ -141,7 +141,7 @@ const TemplateController = {
             let template = await TemplateModel.findByIdAndDelete(req.params.template);
 
             if(!template)
-                return res.json({message: 'Not found'}).status(404);
+                return res.status(404).json({message: 'Not found'});
 
             return res.json({
                 name: template._id,
@@ -156,7 +156,7 @@ const TemplateController = {
             let status = 500;
             if(e instanceof Error) message = e.message;
             if(e instanceof ApiError) status = e.status;
-            return res.json({message: message}).status(status);
+            return res.status(status).json({message: message});
         }
     }, 
 }
