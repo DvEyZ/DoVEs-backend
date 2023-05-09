@@ -74,7 +74,7 @@ const TemplateController = {
     {
         try 
         {
-            let template = await TemplateModel.findById(req.body.name);
+            let template = await TemplateModel.findById(req.params.template);
 
             if(!template)
                 return res.json({message: 'Not found'}).status(404);

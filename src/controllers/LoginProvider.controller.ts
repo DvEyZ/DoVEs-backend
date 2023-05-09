@@ -33,6 +33,7 @@ const LoginProviderController = {
     {
         try
         {
+            console.log(req.body);
             if(!(
                 'name' in req.body && 
                 'type' in req.body && 

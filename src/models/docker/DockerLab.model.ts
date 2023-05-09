@@ -5,7 +5,6 @@ import { dockerConnection, dockerComposeConnection } from "../../services/Docker
 import { Container } from "node-docker-api/lib/container";
 import { DockerMachine } from "./DockerMachine.model";
 import YAML from 'yaml';
-import { MachineDefinition } from "../Template.model";
 import { ApiError } from "../../utils/ApiError";
 
 const DockerLabSchema = new Schema({});
@@ -56,7 +55,11 @@ DockerLabSchema.pre('save', function (this :any, next) {
     
     let compose = YAML.parse(this.template.compose);
     
-    this.template.machineDefs.forEach((v :MachineDefinition) => {
+    this.template.machineDefs.forEach((v :{
+        name :string;
+        ports :{inbound :number, outbound :number}[];
+        supplement :any;
+    }) => {
         let machine = compose[v.name];
         delete compose[v.name];
 

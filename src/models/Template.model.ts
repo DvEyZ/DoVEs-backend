@@ -1,30 +1,30 @@
 import mongoose, { Schema } from "mongoose";
 
-export interface MachineDefinition
-{
-    name :string;
-    ports :{inbound :number, outbound :number}[];
-    supplement :any;
-}
 
 export interface Template
 {
     _id :string;
     type :string;
-    machineDefs: MachineDefinition[];
+    machineDefs: {
+        name :string;
+        ports :{inbound :number, outbound :number}[];
+        supplement :any;
+    }[];
     supplement: any;
 }
 
 const TemplateSchema = new Schema({
     _id: {type: String, required: true},
     machineDefs: {type: [{
-        name: String,
+        name: {type: String},
         ports: {
-            inbound: {type :Number},
-            outbound: {type: Number},
+            type: [{
+                inbound: {type :Number},
+                outbound: {type: Number},
+            }]
         },
         supplement: {type :Object}
-    }], },
+    }], required: true},
     supplement: {type: Object}
 }, {discriminatorKey: 'type'})
 
