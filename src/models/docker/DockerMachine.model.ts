@@ -21,7 +21,7 @@ export class DockerMachine implements Machine
 
         this.name = data.Labels['com.docker.compose.service']
         this.type = 'docker';
-        this.address = DockerConfig.host;
+        this.address = DockerConfig.api?.host || 'localhost';
         this.portRedirections = [...new Set<{ inbound: number; outbound: number; access: string | undefined }>(
             data.Ports.map((v :{IP :string, PrivatePort :number, PublicPort :number, Type :string}) => {
                 return {

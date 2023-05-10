@@ -23,8 +23,6 @@ interface IDockerConfig
         user? :string,  // ssh user, if via ssh
         key? :Buffer    // ssh key, if via ssh       
     } | undefined,
-
-    host :string,
 }
 
 const DockerConfig :IDockerConfig = {
@@ -55,8 +53,6 @@ const DockerConfig :IDockerConfig = {
         } : {
         }),
     },
-
-    host: process.env.DOCKER_HOST || 'localhost',
 }
 
 export default DockerConfig;

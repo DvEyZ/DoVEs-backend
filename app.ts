@@ -20,10 +20,15 @@ app.use(cookieParser());
 app.use(cors())
 
 app.use('/about', aboutRouter);
-
 app.use('/labs', labsRouter);
 app.use('/templates', templateRouter);
 app.use('/loginProviders', loginProviderRouter);
+
+app.get('/', (req, res) => {
+    res.status(200).json({
+        message: 'DoVEs backend API'
+    })
+})
 
 app.use((req :Request, res :Response, next :any) => {
     next(createError(404));
