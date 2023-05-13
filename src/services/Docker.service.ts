@@ -64,7 +64,7 @@ class DockerComposeSSHConnection implements IDockerComposeConnection
                 host: this.options.host,
                 port: this.options.port,
                 username: this.options.user,
-                privateKey: this.options.key
+                privateKey: this.options.key.toString()
             }).then(() => {
                 ssh.mkdir(`${this.options.labPath}/${name}`).then(() => {
                     ssh.exec('tee', [`docker-compose.yml`], {cwd: `${this.options.labPath}/${name}`, stdin: compose}).then(() => {
@@ -86,7 +86,7 @@ class DockerComposeSSHConnection implements IDockerComposeConnection
                 host: this.options.host,
                 port: this.options.port,
                 username: this.options.user,
-                privateKey: this.options.key
+                privateKey: this.options.key.toString()
             }).then(() => {
                 ssh.execCommand(`${this.options.tearDownScript}`, {cwd: `${this.options.labPath}/${name}`}).then((result) => {
                     if(result.code !== 0) reject(result.stderr);

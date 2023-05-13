@@ -6,6 +6,7 @@ import { Container } from "node-docker-api/lib/container";
 import { DockerMachine } from "./DockerMachine.model";
 import YAML from 'yaml';
 import { ApiError } from "../../utils/ApiError";
+import { TemplateModel } from "../Template.model";
 
 const DockerLabSchema = new Schema({});
 
@@ -50,40 +51,48 @@ DockerLabSchema.methods.restart = async function () :Promise<any> {
     await Promise.all(machines.map(async (m) => {await m.restart();}))
 }
 
-DockerLabSchema.pre('save', function (this :any, next) {
+DockerLabSchema.pre('save', async function (this :any, next) {
     if(!this.isNew) return next();
     
-    let compose = YAML.parse(this.template.compose);
+    let template = await TemplateModel.findById(this.template);
+
+    if(!template || template.type !== 'docker')
+        throw new ApiError(400, 'Invalid template.')
+
+    let compose = YAML.parse(template.supplement.base);
     
-    this.template.machineDefs.forEach((v :{
+    template.machineDefs.forEach((v :{
         name :string;
         ports :{inbound :number, outbound :number}[];
         supplement :any;
     }) => {
-        let machine = compose[v.name];
-        delete compose[v.name];
+        let machine = compose['services'][v.name];
 
         for(let i = 0; i < this.machineCount; i++)
         {
             if(i > 99) throw new ApiError(422, 'Number out of range.');
 
-            compose[`${v.name}_${i}`] = {
+            compose['services'][`${v.name}_${i}`] = {
                 ...machine,
                 ports: v.ports.map((v) => {
-                    return `${this.portPrefix}${i}${v.inbound}:${v.outbound}`
+                    return `${this.portPrefix}${('0' + i).slice(-2)}${v.inbound}:${v.outbound}`
                 })
             }
         }
+        
+        delete compose['services'][v.name];
     });
 
-    dockerComposeConnection().createLab(String(this._id), YAML.stringify(compose));
+    await dockerComposeConnection().createLab(String(this.name), YAML.stringify(compose));
 
     return next();
 })
 
-DockerLabSchema.pre('deleteOne', {document:true,query:false}, function (next) {
+DockerLabSchema.pre('deleteOne', {document:true,query:false}, async function (this:any, next) {
     // Tear down Docker lab
-    dockerComposeConnection().tearDownLab(String(this._id));
+    await dockerComposeConnection().tearDownLab(String(this.name));
+
+    return next();
 });
 
 export const DockerLabModel = LabModel.discriminator<Lab>('Lab:docker', DockerLabSchema, 'docker');
