@@ -9,9 +9,9 @@ interface IDockerConfig
     api :{
         socketPath? :string, // path to local Docker socket, if local
         host? :string,  // host of remote Docker socket, if via ssh
-        port? :string,  // ssh port of remote Docker socket, if via ssh
-        user? :string,  // ssh user, if via ssh
-        sshOptions? :any    // ssh key, if via ssh
+        port? :number,  // ssh port of remote Docker socket, if via ssh
+        username? :string,  // ssh user, if via ssh
+        key? :Buffer    // ssh key, if via ssh
     } | undefined,
 
     compose :{
@@ -19,7 +19,7 @@ interface IDockerConfig
         createScript :string,
         tearDownScript :string,
         host? :string,  // host of remote Docker socket, if via ssh
-        port? :string,  // ssh port of remote Docker socket, if via ssh
+        port? :number,  // ssh port of remote Docker socket, if via ssh
         user? :string,  // ssh user, if via ssh
         key? :Buffer    // ssh key, if via ssh       
     } | undefined,
@@ -33,11 +33,9 @@ const DockerConfig :IDockerConfig = {
     } : 
     process.env.DOCKER_VIA === 'ssh' ? {
         host: process.env.DOCKER_SSH_HOST,
-        port: process.env.DOCKER_SSH_PORT,
-        user: process.env.DOCKER_SSH_USER,
-        sshOptions: {
-            key: process.env.DOCKER_SSH_KEY ? fs.readFileSync(process.env.DOCKER_SSH_KEY) : undefined
-        }
+        port: Number(process.env.DOCKER_SSH_PORT),
+        username: process.env.DOCKER_SSH_USER,
+        key: process.env.DOCKER_SSH_KEY ? fs.readFileSync(process.env.DOCKER_SSH_KEY) : undefined
     } : undefined,
 
     compose: {
@@ -47,7 +45,7 @@ const DockerConfig :IDockerConfig = {
         ...(process.env.DOCKER_VIA === 'local' ? {} : 
         process.env.DOCKER_VIA === 'ssh' ? {
             host: process.env.DOCKER_SSH_HOST,
-            port: process.env.DOCKER_SSH_PORT,
+            port: Number(process.env.DOCKER_SSH_PORT),
             user: process.env.DOCKER_SSH_USER,
             key: process.env.DOCKER_SSH_KEY ? fs.readFileSync(process.env.DOCKER_SSH_KEY) : undefined
         } : {

@@ -13,7 +13,7 @@ const LoginProviderController = {
             return res.status(200).json({
                 loginProviders: providers.map((v) => {
                     return {
-                        name: v._id,
+                        name: v.name,
                         type: v.type,
                     }
                 })
@@ -40,7 +40,7 @@ const LoginProviderController = {
             ))
                 return res.status(422).json({message: 'Missing properties.'});
 
-            if(await LoginProviderModel.findById(req.body.name))
+            if(await LoginProviderModel.findOne({name: req.body.name}))
                 return res.status(409).json({message: `Login provider "${req.body.name} already exists`})
 
             let model = LoginProviderFactory(req.body.type);
@@ -49,7 +49,7 @@ const LoginProviderController = {
                 return res.status(422).json({message: 'Invalid login provider type.'});
 
             let newProvider = await model.create({
-                _id: req.body.name,
+                name: req.body.name,
                 type: req.body.type,
                 config: req.body.config
             });
@@ -57,7 +57,7 @@ const LoginProviderController = {
             let provider = await newProvider.save();
 
             return res.status(201).json({
-                name: provider._id,
+                name: provider.name,
                 type: provider.type,
                 config: provider.config,
             });
@@ -76,13 +76,13 @@ const LoginProviderController = {
     {
         try
         {
-            let provider = await LoginProviderModel.findById(req.params.provider);
+            let provider = await LoginProviderModel.findOne({name: req.params.provider});
 
             if(!provider)
                 return res.status(404).json({message: 'Not found'})
 
             return res.status(200).json({
-                name: provider._id,
+                name: provider.name,
                 type: provider.type,
                 config: provider.config,
             });
@@ -108,7 +108,7 @@ const LoginProviderController = {
             ))
                 return res.status(422).json({message: 'Missing properties.'});
 
-            let newProvider = await LoginProviderModel.findById(req.params.provider);
+            let newProvider = await LoginProviderModel.findOne({name: req.params.provider});
 
             if(!newProvider)
                 return res.status(404).json({message: 'Not found'});
@@ -118,7 +118,7 @@ const LoginProviderController = {
             let provider = await newProvider.save();
 
             return res.status(200).json({
-                name: provider._id,
+                name: provider.name,
                 type: provider.type,
                 config: provider.config,
             });
@@ -137,13 +137,13 @@ const LoginProviderController = {
     {
         try
         {
-            let provider = await LoginProviderModel.findByIdAndDelete(req.params.provider);
+            let provider = await LoginProviderModel.findOneAndDelete({name: req.params.provider});
 
             if(!provider)
                 return res.status(404).json({message: 'Not found'});
 
             return res.status(200).json({
-                name: provider._id,
+                name: provider.name,
                 type: provider.type,
                 config: provider.config,
             });

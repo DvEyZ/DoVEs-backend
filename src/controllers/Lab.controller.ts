@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Lab, LabModel } from '../models/Lab.model';
 import { LabFactory } from '../models/factories/LabFactory.model';
 import { ApiError } from '../utils/ApiError';
+import mongoose from 'mongoose';
 
 const getUpStatus = async(lab :Lab) :Promise<Number> =>
 {

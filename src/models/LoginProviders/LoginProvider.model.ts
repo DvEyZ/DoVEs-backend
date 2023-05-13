@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 export interface LoginProvider
 {
-    _id :string;
+    name :string;
     type :string;
     config :any;
 
@@ -16,7 +16,7 @@ export interface LoginProvider
 }
 
 export const LoginProviderSchema = new Schema({
-    _id: {type: String, required: true},
+    name: {type: String, required: true, unique: true},
     config: {type: Object, required: true}
 }, {discriminatorKey: 'type'});
 

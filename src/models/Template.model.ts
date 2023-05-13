@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 
 export interface Template
 {
-    _id :string;
+    name :string;
     type :string;
     machineDefs: {
         name :string;
@@ -14,7 +14,7 @@ export interface Template
 }
 
 const TemplateSchema = new Schema({
-    _id: {type: String, required: true},
+    name: {type: String, required: true, unique: true},
     machineDefs: {type: [{
         name: {type: String},
         ports: {

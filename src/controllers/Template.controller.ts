@@ -13,7 +13,7 @@ const TemplateController = {
             return res.status(200).json({
                 templates: templates.map((v) => {
                     return {
-                        name: v._id,
+                        name: v.name,
                         type: v.type
                     }
                 })
@@ -31,7 +31,7 @@ const TemplateController = {
 
     async create(req :Request, res :Response)
     {
-        try 
+        try
         {
             if(!(
                 'name' in req.body && 
@@ -39,6 +39,9 @@ const TemplateController = {
                 'machineDefs' in req.body
             ))
                 return res.status(422).json({message: 'Missing properties.'});
+
+            if(await TemplateModel.findOne({name: req.body.name}))
+                return res.status(409).json({message: `Template "${req.body.name} already exists`})
             
             let model = TemplateFactory(req.body.type);
 
@@ -46,7 +49,7 @@ const TemplateController = {
                 return res.status(422).json({message: 'Invalid template type'}); 
 
             let newTemplate = await model.create({
-                _id: req.body.name,
+                name: req.body.name,
                 machineDefs: req.body.machineDefs,
                 supplement: req.body.supplement
             });
@@ -54,7 +57,7 @@ const TemplateController = {
             let template = await newTemplate.save();
 
             return res.status(201).json({
-                name: template._id,
+                name: template.name,
                 type: template.type,
                 machineDefs: template.machineDefs,
                 supplement: template.supplement
@@ -74,13 +77,13 @@ const TemplateController = {
     {
         try 
         {
-            let template = await TemplateModel.findById(req.params.template);
+            let template = await TemplateModel.findOne({name: req.params.template});
 
             if(!template)
                 return res.status(404).json({message: 'Not found'});
             
             return res.status(200).json({
-                name: template._id,
+                name: template.name,
                 type: template.type,
                 machineDefs: template.machineDefs,
                 supplement: template.supplement
@@ -107,7 +110,7 @@ const TemplateController = {
             ))
                 return res.status(422).json({message: 'Missing properties.'});
 
-            let newTemplate = await TemplateModel.findById(req.body.name);
+            let newTemplate = await TemplateModel.findOne({name: req.body.name});
 
             if(!newTemplate)
                 return res.status(404).json({message: 'Not found'});
@@ -118,7 +121,7 @@ const TemplateController = {
             let template = await newTemplate.save();
     
             return res.status(201).json({
-                name: template._id,
+                name: template.name,
                 type: template.type,
                 machineDefs: template.machineDefs,
                 supplement: template.supplement
@@ -138,13 +141,13 @@ const TemplateController = {
     {
         try 
         {
-            let template = await TemplateModel.findByIdAndDelete(req.params.template);
+            let template = await TemplateModel.findOneAndDelete({name: req.params.template});
 
             if(!template)
                 return res.status(404).json({message: 'Not found'});
 
             return res.json({
-                name: template._id,
+                name: template.name,
                 type: template.type,
                 machineDefs: template.machineDefs,
                 supplement: template.supplement
