@@ -128,9 +128,9 @@ export class GuacamoleService implements IGuacamoleService
 
     user(name :string) :GuacamoleServiceUser {
         let apiUrl = this.apiUrl
-        let getToken = this.#getToken;
-        let resolveConnectionName = this.#resolveConnectionName;
-        let resolveConnectionGroupName = this.#resolveConnectionGroupName;
+        let getToken = () => this.#getToken();
+        let resolveConnectionName = (name :string) => this.#resolveConnectionName(name);
+        let resolveConnectionGroupName = (name :string) => this.#resolveConnectionGroupName(name);
 
         return {
             async get() :Promise<any>
@@ -249,8 +249,9 @@ export class GuacamoleService implements IGuacamoleService
     connection(name :string) :GuacamoleServiceConnection
     {
         let apiUrl = this.apiUrl
-        let getToken = this.#getToken;
-        let resolveConnectionName = this.#resolveConnectionName;
+        let getToken = () => this.#getToken();
+        let resolveConnectionName = (name :string) => this.#resolveConnectionName(name);
+
         return {
             async get() :Promise<any>
             {
@@ -349,7 +350,8 @@ export class GuacamoleService implements IGuacamoleService
     userGroup(name :string) :GuacamoleServiceUserGroup
     {
         let apiUrl = this.apiUrl
-        let getToken = this.#getToken;
+        let getToken = () => this.#getToken();
+        
         return {
             async get() :Promise<any>
             {
@@ -398,8 +400,8 @@ export class GuacamoleService implements IGuacamoleService
     connectionGroup(name :string) :GuacamoleServiceConnectionGroup
     {
         let apiUrl = this.apiUrl
-        let getToken = this.#getToken;
-        let resolveConnectionGroupName = this.#resolveConnectionGroupName;
+        let getToken = () => this.#getToken();
+        let resolveConnectionGroupName = (name :string) => this.#resolveConnectionGroupName(name);
 
         return {
             async get() :Promise<any>
