@@ -7,7 +7,7 @@ const MachineController = {
     {
         try
         {
-            let lab = await LabModel.findById(req.params.lab);
+            let lab = await LabModel.findOne({name: req.params.lab});
             if(!lab)
                 return res.status(404).json({message: 'Not found'});
 
@@ -36,7 +36,7 @@ const MachineController = {
     {
         try
         {
-            let lab = await LabModel.findById(req.params.lab);
+            let lab = await LabModel.findOne({name: req.params.lab});
             if(!lab)
                 return res.status(404).json({message: 'Not found'});
             
@@ -44,8 +44,10 @@ const MachineController = {
 
             return res.status(200).json({
                 name: machine.name,
+                type: lab.type,
                 status: machine.status,
-                address: machine.address
+                address: machine.address,
+                ports: machine.portRedirections
             })
         }
         catch(e)
@@ -63,16 +65,16 @@ const MachineController = {
         try
         {
             if(!(
-                'op' in req.body
+                'action' in req.body
             ))
                 return res.status(422).json({message: 'Missing properties.'});
 
-            let lab = await LabModel.findById(req.params.lab);
+            let lab = await LabModel.findOne({name: req.params.lab});
             if(!lab)
                 return res.status(404).json({message: 'Not found'});
             
             let machine = await lab.getMachine(req.params.machine);
-
+            
             let op = req.body.action;
 
             if(!(['start','stop','restart'].includes(op)))
@@ -91,8 +93,10 @@ const MachineController = {
 
             return res.status(200).json({
                 name: newMachine.name,
+                type: lab.type,
                 status: newMachine.status,
-                address: newMachine.address
+                address: newMachine.address,
+                ports: machine.portRedirections
             });
         }
         catch(e)

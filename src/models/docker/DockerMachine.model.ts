@@ -22,15 +22,15 @@ export class DockerMachine implements Machine
         this.name = data.Labels['com.docker.compose.service']
         this.type = 'docker';
         this.address = DockerConfig.api?.host || 'localhost';
-        this.portRedirections = [...new Set<{ inbound: number; outbound: number; access: string | undefined }>(
-            data.Ports.map((v :{IP :string, PrivatePort :number, PublicPort :number, Type :string}) => {
-                return {
-                    inbound: v.PrivatePort, 
-                    outbound: v.PublicPort, 
-                    access: v.PrivatePort === 22 ? 'ssh' : undefined
-                }
-            })
-        )];
+        let prs = data.Ports.map((v :{IP :string, PrivatePort :number, PublicPort :number, Type :string}) => {
+            return {
+                inbound: v.PrivatePort, 
+                outbound: v.PublicPort, 
+                access: v.PrivatePort === 22 ? 'ssh' : undefined
+            }
+        });
+
+        this.portRedirections = [...new Set(prs.map((v :any) => JSON.stringify(v)))].map((v :any) => JSON.parse(v))
 
         this.supplement = {};
     }

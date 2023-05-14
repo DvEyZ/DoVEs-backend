@@ -152,7 +152,7 @@ const LabController = {
         try
         {
             if(!(
-                'op' in req.body
+                'action' in req.body
             ))
                 return res.status(422).json({message: 'Missing properties.'});
             
