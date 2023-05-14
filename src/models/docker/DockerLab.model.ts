@@ -36,24 +36,22 @@ DockerLabSchema.methods.getMachine = async function (name :string) :Promise<Mach
     })
 }
 
-DockerLabSchema.methods.start = async function () :Promise<any> {
+DockerLabSchema.methods.start = async function (this :Lab) :Promise<any> {
     let machines :Machine[] = await this.getMachines()
     await Promise.all(machines.map(async (m) => {await m.start();}))
 }
 
-DockerLabSchema.methods.stop = async function () :Promise<any> {
+DockerLabSchema.methods.stop = async function (this :Lab) :Promise<any> {
     let machines :Machine[] = await this.getMachines()
     await Promise.all(machines.map(async (m) => {await m.stop();}))
 }
 
-DockerLabSchema.methods.restart = async function () :Promise<any> {
+DockerLabSchema.methods.restart = async function (this :Lab) :Promise<any> {
     let machines :Machine[] = await this.getMachines()
     await Promise.all(machines.map(async (m) => {await m.restart();}))
 }
 
-DockerLabSchema.pre('save', async function (this :any, next) {
-    if(!this.isNew) return next();
-    
+DockerLabSchema.methods.labUp = async function (this :Lab) :Promise<any> {    
     let template = await TemplateModel.findById(this.template);
 
     if(!template || template.type !== 'docker')
@@ -83,16 +81,12 @@ DockerLabSchema.pre('save', async function (this :any, next) {
         delete compose['services'][v.name];
     });
 
-    await dockerComposeConnection().createLab(String(this.name), YAML.stringify(compose));
+    await dockerComposeConnection().createLab(String(this.name), YAML.stringify(compose, {defaultKeyType:'PLAIN', defaultStringType:'QUOTE_SINGLE'}));
+}
 
-    return next();
-})
-
-DockerLabSchema.pre('deleteOne', {document:true,query:false}, async function (this:any, next) {
-    // Tear down Docker lab
-    await dockerComposeConnection().tearDownLab(String(this.name));
-
-    return next();
-});
+DockerLabSchema.methods.labDown = async function () {
+    // Tu coś nie działa
+    await dockerComposeConnection().tearDownLab(this.name);
+}
 
 export const DockerLabModel = LabModel.discriminator<Lab>('Lab:docker', DockerLabSchema, 'docker');

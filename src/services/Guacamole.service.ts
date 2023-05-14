@@ -103,7 +103,7 @@ export class GuacamoleService implements IGuacamoleService
         })).then((res) => res.json());
 
         let a :any = Object.values(cons).filter((v :any) => v.name === connectionName)[0];
-        return a.identifier;
+        return a?.identifier;
     }
 
     async #resolveConnectionGroupName(connectionName :string) :Promise<string>
@@ -114,7 +114,7 @@ export class GuacamoleService implements IGuacamoleService
         })).then((res) => res.json());
 
         let a :any = Object.values(cons).filter((v :any) => v.name === connectionName)[0];
-        return a.identifier;
+        return a?.identifier;
     }
 
     async check() :Promise<any>
@@ -148,6 +148,7 @@ export class GuacamoleService implements IGuacamoleService
                 let user = await fetch(`${apiUrl}/session/data/${dataSource}/users?` + new URLSearchParams({
                     'token': token
                 }), {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -174,13 +175,11 @@ export class GuacamoleService implements IGuacamoleService
             async delete() :Promise<any>
             {
                 let { token, dataSource } = await getToken();
-                let user = await fetch(`${apiUrl}/session/data/${dataSource}/users/${name}?` + new URLSearchParams({
+                await fetch(`${apiUrl}/session/data/${dataSource}/users/${name}?` + new URLSearchParams({
                     'token': token
                 }), {
                     method: 'DELETE'
-                }).then((res) => res.json());
-
-                return user;
+                });
             },
             async addConnection(connectionName :string) :Promise<any>
             {
@@ -251,6 +250,7 @@ export class GuacamoleService implements IGuacamoleService
         let apiUrl = this.apiUrl
         let getToken = () => this.#getToken();
         let resolveConnectionName = (name :string) => this.#resolveConnectionName(name);
+        let resolveConnectionGroupName = (name :string) => this.#resolveConnectionGroupName(name);
 
         return {
             async get() :Promise<any>
@@ -267,6 +267,8 @@ export class GuacamoleService implements IGuacamoleService
             {
                 let { token, dataSource } = await getToken();
 
+                let group = await resolveConnectionGroupName(groupName);
+
                 let con = await fetch(`${apiUrl}/session/data/${dataSource}/connections?` + new URLSearchParams({
                     'token': token
                 }), {
@@ -275,7 +277,7 @@ export class GuacamoleService implements IGuacamoleService
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        "parentIdentifier": groupName,
+                        "parentIdentifier": group,
                         "name": name,
                         "protocol": protocol,
                         "parameters": {
@@ -337,12 +339,11 @@ export class GuacamoleService implements IGuacamoleService
                 let { token, dataSource } = await getToken();
                 let conName = resolveConnectionName(name);
 
-                let con = await fetch(`${apiUrl}/session/data/${dataSource}/connections/${conName}?` + new URLSearchParams({
+                await fetch(`${apiUrl}/session/data/${dataSource}/connections/${conName}?` + new URLSearchParams({
                     'token': token
                 }), {
                     method: 'DELETE'
-                }).then((res) => res.json());
-                return con;
+                });
             }
         }
     }
@@ -387,12 +388,11 @@ export class GuacamoleService implements IGuacamoleService
             {
                 let { token, dataSource } = await getToken();
 
-                let group = await fetch(`${apiUrl}/session/data/${dataSource}/userGroups/${name}?` + new URLSearchParams({
+                await fetch(`${apiUrl}/session/data/${dataSource}/userGroups/${name}?` + new URLSearchParams({
                     'token': token
                 }), {
                     method: 'DELETE'
-                }).then((res) => res.json());
-                return group;
+                });
             }
         }
     }
@@ -443,12 +443,11 @@ export class GuacamoleService implements IGuacamoleService
                 let { token, dataSource } = await getToken();
                 let conGroupName = await resolveConnectionGroupName(name);
 
-                let group = await fetch(`${apiUrl}/session/data/${dataSource}/connectionGroups/${conGroupName}?` + new URLSearchParams({
+                await fetch(`${apiUrl}/session/data/${dataSource}/connectionGroups/${conGroupName}?` + new URLSearchParams({
                     'token': token
                 }), {
                     method: 'DELETE'
-                }).then((res) => res.json());
-                return group;
+                });
             }
         }
     }

@@ -37,7 +37,7 @@ class DockerComposeLocalConnection implements IDockerComposeConnection
             exec(`${this.options.tearDownScript}`, {cwd: `${this.options.labPath}/${name}`}, (error, stdout, stderr) => {
                 if(error) reject(error);
 
-                fs.rmdirSync(`${this.options.labPath}/${name}`);
+                fs.rmdirSync(`${this.options.labPath}/${name}`, {recursive: true});
                 resolve(`${name}`)
             })
         })
@@ -74,7 +74,7 @@ class DockerComposeSSHConnection implements IDockerComposeConnection
                         });
                     })
                 });
-            });
+            }).catch((e) => {reject(e)});
         });
     }
 
@@ -90,12 +90,12 @@ class DockerComposeSSHConnection implements IDockerComposeConnection
             }).then(() => {
                 ssh.execCommand(`${this.options.tearDownScript}`, {cwd: `${this.options.labPath}/${name}`}).then((result) => {
                     if(result.code !== 0) reject(result.stderr);
-                    ssh.execCommand(`rmdir ${this.options.labPath}/${name}`).then((result) => {
+                    ssh.execCommand(`rm -rf ${this.options.labPath}/${name}`).then((result) => {
                         if(result.code !== 0) reject(result.stderr);
                         resolve(`${name}`);
                     })
                 })
-            });
+            }).catch((e) => {reject(e)});
         });
     }
 }

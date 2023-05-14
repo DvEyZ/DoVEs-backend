@@ -9,7 +9,7 @@ const getUpStatus = async(lab :Lab) :Promise<Number> =>
 {
     return lab.getMachines().then((machines) => {
         let run = machines.filter((v) => v.status == 'running')
-        return Number((run.length / machines.length).toPrecision(2)) * 100
+        return Number((run.length / lab.machineCount).toPrecision(2)) * 100
     })
 }
 
@@ -19,14 +19,15 @@ const LabController = {
         try
         {
             let labs = await LabModel.find();
+
             return res.status(200).json({
-                labs: labs.map(async (lab) => {
+                labs: await Promise.all(labs.map(async (lab) => {
                     return {
                         name: lab.name,
                         type: lab.type,
                         up: await getUpStatus(lab),
                     }
-                })
+                }))
             });
         }
         catch(e)
@@ -79,6 +80,9 @@ const LabController = {
                     return id;
                 }))
             });
+
+            await lab.labUp();
+            await lab.loginProvidersInit();
 
             await lab.save();
 
@@ -198,18 +202,23 @@ const LabController = {
     {
         try
         {
-            let lab = await LabModel.findOneAndDelete({name: req.params.lab}).populate('template').populate('loginProviders');
+            let lab = await LabModel.findOne({name: req.params.lab}).populate('template').populate('loginProviders');
 
             if(!lab)
             {
                 return res.status(404).json({message: 'Not found'})
             }
 
+            await lab.loginProvidersDown();
+            await lab.labDown();
+
+            let nLab = await lab.deleteOne();
+
             return res.status(200).json({
-                name: lab.name,
-                type: lab.type,
-                template: lab.template,
-                loginProviders: lab.loginProviders
+                name: nLab.name,
+                type: nLab.type,
+                template: nLab.template,
+                loginProviders: nLab.loginProviders
             });
         }
         catch(e)

@@ -1,7 +1,8 @@
 import mongoose, { Document, Mongoose, Schema } from "mongoose";
 import { Machine } from "./Machine.model";
 import { LoginProvider, LoginProviderModel } from "./LoginProviders/LoginProvider.model";
-import { Template } from "./Template.model";
+import { Template, TemplateModel } from "./Template.model";
+import DockerConfig from "../configs/Docker.config";
 
 export interface Lab
 {
@@ -11,6 +12,12 @@ export interface Lab
     portPrefix :number;
     machineCount :number;
     loginProviders :LoginProvider[];
+
+    labUp() :Promise<any>;
+    labDown() :Promise<any>;
+
+    loginProvidersInit() :Promise<any>;
+    loginProvidersDown() :Promise<any>;
 
     getMachines() :Promise<Machine[]>;
     getMachine(name :string) :Promise<Machine>;
@@ -28,28 +35,49 @@ export const LabSchema = new Schema({
     loginProviders: {type: [Schema.Types.ObjectId], ref: 'LoginProvider', required: true}
 }, {discriminatorKey: 'type'});
 
-LabSchema.post('save', async function (doc, next) {
-    if(!this.isNew) next();
-
+LabSchema.methods.loginProvidersInit = async function (this :any) {
     // Init login providers
-    let lab = await LabModel.findById(doc._id).populate('template').populate('loginProviders');
-    if(!lab)
-        return next(new Error('This should not happen.'));
-    let machines = await lab.getMachines();
+    
+    let loginProviders = await Promise.all(this.loginProviders.map(async (v :any) => 
+        await LoginProviderModel.findById(v)
+    ));
 
-    lab.loginProviders.forEach(async (provider) => {
-        provider.createEnvironment(lab!.name, {});
+    loginProviders.forEach(async (provider) => {
+        await provider.createEnvironment(this.name, {});
+        
+        let template = await TemplateModel.findById(this.template);
+        if(!template)
+            throw new Error('This should not happen.');
 
-        machines.forEach((m) => {
-            m.portRedirections.filter((v) => {
-                return !!v.access;
-            }).forEach((port) => {
-                provider.createConnection(m.name, lab!.name, m.address, port.outbound, {
-                    protocol: port.access
-                });
-            })
-        });
+        let address = DockerConfig.api?.host || 'localhost';
+
+        for(let i = 1; i < this.machineCount +1; i++)
+        {
+            await provider.createConnection(
+                `${this.name}-${('0'+i).slice(-2)}`, 
+                this.name, 
+                address, 
+                Number(`${this.portPrefix}${('0' + i).slice(-2)}${template.machineDefs.filter((v) => {
+                    return !!v.ports.filter((v) => v.inbound === 22)
+                })[0].ports.filter((v) => v.inbound === 22)[0].outbound}`), 
+                {protocol: 'ssh'}
+            );
+        }
     });
-});
+};
+
+LabSchema.methods.loginProvidersDown = async function () {
+    let loginProviders = await Promise.all(this.loginProviders.map(async (v :any) => 
+        await LoginProviderModel.findById(v)
+    ));
+
+    loginProviders.forEach(async (provider) => {
+        await provider.tearDownEnvironment(this.name);
+        for(let i = 1; i < this.machineCount +1; i++)
+        {
+            await provider.tearDownConnection(`${this.name}-${('0'+i).slice(-2)}`);
+        }
+    })
+}
 
 export const LabModel = mongoose.model<Lab>('Lab',LabSchema);
