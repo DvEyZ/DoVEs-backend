@@ -93,6 +93,7 @@ const LabController = {
                 type: nLab!.type,
                 up: await getUpStatus(nLab!),
                 template: nLab!.template,
+                portPrefix: nLab!.portPrefix,
                 machines: (await nLab!.getMachines()).map((machine) => {
                     return {
                         name: machine.name,
@@ -127,6 +128,7 @@ const LabController = {
                 type: lab.type,
                 up: await getUpStatus(lab),
                 template: lab.template,
+                portPrefix: lab.portPrefix,
                 machines: (await lab.getMachines()).map((machine) => {
                     return {
                         name: machine.name,
@@ -174,11 +176,12 @@ const LabController = {
             
             let nLab = await LabModel.findOne({name: req.params.lab}).populate('template').populate('loginProviders');
 
-            return res.status(201).json({
+            return res.status(200).json({
                 name: nLab!.name,
                 type: nLab!.type,
                 up: await getUpStatus(nLab!),
                 template: nLab!.template,
+                portPrefix: nLab!.portPrefix,
                 machines: (await nLab!.getMachines()).map((machine) => {
                     return {
                         name: machine.name,
@@ -218,6 +221,7 @@ const LabController = {
                 name: nLab.name,
                 type: nLab.type,
                 template: nLab.template,
+                portPrefix: nLab.portPrefix,
                 loginProviders: nLab.loginProviders
             });
         }

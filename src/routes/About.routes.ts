@@ -1,6 +1,5 @@
 import express from 'express';
 import packageJson from '../../package.json';
-import DockerConfig from '../configs/Docker.config';
 
 const router = express.Router();
 
@@ -9,12 +8,7 @@ router.get('/', (req, res) => {
         running: packageJson.name,
         version: packageJson.version,
         labTypes: [
-            {
-                name: 'docker',
-                via: DockerConfig.via,
-                api: DockerConfig.api,
-                compose: DockerConfig.compose
-            }
+            'docker'
         ],
         loginProviderTypes: [
             'guacamole'

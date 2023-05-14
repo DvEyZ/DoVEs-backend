@@ -96,7 +96,7 @@ const MachineController = {
                 type: lab.type,
                 status: newMachine.status,
                 address: newMachine.address,
-                ports: machine.portRedirections
+                ports: newMachine.portRedirections
             });
         }
         catch(e)
