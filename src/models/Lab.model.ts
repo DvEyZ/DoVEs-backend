@@ -53,15 +53,18 @@ LabSchema.methods.loginProvidersInit = async function (this :any) {
 
         for(let i = 1; i < this.machineCount +1; i++)
         {
-            await provider.createConnection(
-                `${this.name}-${('0'+i).slice(-2)}`, 
-                this.name, 
-                address, 
-                Number(`${this.portPrefix}${('0' + i).slice(-2)}${template.machineDefs.filter((v) => {
-                    return !!v.ports.filter((v) => v.inbound === 22)
-                })[0].ports.filter((v) => v.inbound === 22)[0].outbound}`), 
-                {protocol: 'ssh'}
-            );
+            let ap = template.machineDefs.filter((v) => {
+                return !!v.ports.filter((v) => v.inbound === 22)
+            })[0].ports.filter((v) => v.inbound === 22)[0];
+
+            if(ap)
+                await provider.createConnection(
+                    `${this.name}-${('0'+i).slice(-2)}`, 
+                    this.name, 
+                    address, 
+                    Number(`${this.portPrefix}${('0' + i).slice(-2)}${ap.outbound}`), 
+                    {protocol: 'ssh'}
+                );
         }
     });
 };
