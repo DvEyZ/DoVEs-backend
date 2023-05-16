@@ -17,3 +17,7 @@ DoVEs - Docker Virtual Environments is a software for creating virtual environme
 - `DOCKER_COMPOSE_CREATE_SCRIPT` - script used to set up a lab. It will operate in newly created directory in `LAB_PATH`, with `docker-compose.yml` present. Usually `docker-compose up` will be enough.
 - `DOCKER_COMPOSE_TEAR_DOWN_SCRIPT` - script used to tear down a lab. It will operate in lab directory in `LAB_PATH`, with `docker-compose.yml` present. Usually `docker-compose down` will be enough.
 - `LP_DEFAULT_PASSWORD` - default password for newly created login provider users. Defaults to `password`.
+
+## Known issues
+
+- If the Docker host is down or otherwise inaccessible, and a request involving `node-docker-api` is made, the app will crash. There is nothing I can do about that.
