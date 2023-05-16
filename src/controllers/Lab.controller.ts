@@ -7,10 +7,9 @@ import { LoginProviderModel } from '../models/LoginProviders/LoginProvider.model
 
 const getUpStatus = async(lab :Lab) :Promise<Number> =>
 {
-    return lab.getMachines().then((machines) => {
-        let run = machines.filter((v) => v.status == 'running')
-        return Number((run.length / lab.machineCount).toPrecision(2)) * 100
-    })
+    let maxines = await lab.getMachines();
+    let run = maxines.filter((v) => v.status == 'running')
+    return Number((run.length / lab.machineCount).toPrecision(2)) * 100
 }
 
 const LabController = {
@@ -62,7 +61,7 @@ const LabController = {
             if(!model)
                 return res.status(422).json({message: 'Invalid lab type.'});
 
-            let lab = await model.create({
+            let lab = new model({
                 name: req.body.name,
                 template: await (async () => 
                     {
@@ -81,8 +80,8 @@ const LabController = {
                 }))
             });
 
-            await lab.labUp();
-            await lab.loginProvidersInit();
+            await lab.labUp().catch((e) => {throw e});
+            await lab.loginProvidersInit().catch((e) => {throw e});
 
             await lab.save();
 
@@ -212,8 +211,8 @@ const LabController = {
                 return res.status(404).json({message: 'Not found'})
             }
 
-            await lab.loginProvidersDown();
-            await lab.labDown();
+            await lab.loginProvidersDown().catch((e) => {throw e});
+            await lab.labDown().catch((e) => {throw e});
 
             let nLab = await lab.deleteOne();
 

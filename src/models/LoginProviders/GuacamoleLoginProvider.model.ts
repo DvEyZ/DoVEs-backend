@@ -1,6 +1,7 @@
 import { Schema } from "mongoose";
 import { LoginProvider, LoginProviderModel } from "./LoginProvider.model";
 import { GuacamoleService } from "../../services/Guacamole.service";
+import LoginProviderConfig from "../../configs/LoginProviders.config";
 
 export interface GuacamoleLoginProvider extends LoginProvider
 {
@@ -38,7 +39,7 @@ GuacamoleLoginProviderSchema.methods.createConnection = async function (name :st
 }) :Promise<any> {
     let guacamole = new GuacamoleService(this.config.apiUrl, this.config.adminUsername, this.config.adminPassword);
     
-    await guacamole.user(name).create('someDefaultPassword');
+    await guacamole.user(name).create(LoginProviderConfig.defaultPassword);
     await guacamole.connection(name).create(group, config.protocol, host, port);
     await guacamole.user(name).addUserGroup(group);
     await guacamole.user(name).addConnectionGroup(group);

@@ -35,7 +35,7 @@ const DockerConfig :IDockerConfig = {
     process.env.DOCKER_VIA === 'ssh' ? {
         protocol: 'ssh',
         host: process.env.DOCKER_SSH_HOST,
-        port: Number(process.env.DOCKER_SSH_PORT),
+        port: Number(process.env.DOCKER_SSH_PORT) || 22,
         username: process.env.DOCKER_SSH_USER,
         sshOptions: {
             privateKey: process.env.DOCKER_SSH_KEY ? fs.readFileSync(process.env.DOCKER_SSH_KEY) : undefined
@@ -49,7 +49,7 @@ const DockerConfig :IDockerConfig = {
         ...(process.env.DOCKER_VIA === 'local' ? {} : 
         process.env.DOCKER_VIA === 'ssh' ? {
             host: process.env.DOCKER_SSH_HOST,
-            port: Number(process.env.DOCKER_SSH_PORT),
+            port: Number(process.env.DOCKER_SSH_PORT) || 22,
             user: process.env.DOCKER_SSH_USER,
             key: process.env.DOCKER_SSH_KEY ? fs.readFileSync(process.env.DOCKER_SSH_KEY) : undefined
         } : {

@@ -51,7 +51,7 @@ LabSchema.methods.loginProvidersInit = async function (this :any) {
 
         let address = DockerConfig.api?.host || 'localhost';
 
-        for(let i = 1; i < this.machineCount +1; i++)
+        for(let i = 0; i < this.machineCount; i++)
         {
             let ap = template.machineDefs.filter((v) => {
                 return !!v.ports.filter((v) => v.inbound === 22)
@@ -76,7 +76,7 @@ LabSchema.methods.loginProvidersDown = async function () {
 
     loginProviders.forEach(async (provider) => {
         await provider.tearDownEnvironment(this.name);
-        for(let i = 1; i < this.machineCount +1; i++)
+        for(let i = 0; i < this.machineCount; i++)
         {
             await provider.tearDownConnection(`${this.name}-${('0'+i).slice(-2)}`);
         }

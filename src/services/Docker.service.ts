@@ -3,6 +3,7 @@ import DockerConfig from "../configs/Docker.config";
 import { NodeSSH } from 'node-ssh';
 import fs from 'node:fs';
 import { exec } from 'node:child_process';
+import { ApiError } from '../utils/ApiError';
 
 export const dockerConnection = () => new Docker(DockerConfig.api);
 
@@ -58,45 +59,54 @@ class DockerComposeSSHConnection implements IDockerComposeConnection
 
     async createLab(name: string, compose: string) :Promise<any> 
     {
-        return new Promise((resolve, reject) => {
+        try
+        {
             const ssh = new NodeSSH();
-            ssh.connect({
+            await ssh.connect({
                 host: this.options.host,
                 port: this.options.port,
                 username: this.options.user,
                 privateKey: this.options.key.toString()
-            }).then(() => {
-                ssh.mkdir(`${this.options.labPath}/${name}`).then(() => {
-                    ssh.exec('tee', [`docker-compose.yml`], {cwd: `${this.options.labPath}/${name}`, stdin: compose}).then(() => {
-                        ssh.execCommand(`${this.options.createScript}`, {cwd: `${this.options.labPath}/${name}`}).then((result) => {
-                            if(result.code !== 0) reject(result.stderr);
-                            resolve(`${name}`);
-                        });
-                    })
-                });
-            }).catch((e) => {reject(e)});
-        });
+            });
+
+            await ssh.mkdir(`${this.options.labPath}/${name}`)
+            await ssh.exec('tee', [`docker-compose.yml`], {cwd: `${this.options.labPath}/${name}`, stdin: compose})
+            let result = await ssh.execCommand(`${this.options.createScript}`, {cwd: `${this.options.labPath}/${name}`})
+            
+            if(result.code !== 0) throw new Error(`Creation script failed: ${result.stderr}`);
+        }
+        catch(e)
+        {
+            let message = 'Unknown error';
+            if(e instanceof Error) message = e.message
+            throw new ApiError(500, `Error connecting to Docker host: ${message}`);
+        }
     }
 
     async tearDownLab(name: string) :Promise<any> 
     {
-        return new Promise((resolve, reject) => {
+        try
+        {
             const ssh = new NodeSSH();
-            ssh.connect({
+            await ssh.connect({
                 host: this.options.host,
                 port: this.options.port,
                 username: this.options.user,
                 privateKey: this.options.key.toString()
-            }).then(() => {
-                ssh.execCommand(`${this.options.tearDownScript}`, {cwd: `${this.options.labPath}/${name}`}).then((result) => {
-                    if(result.code !== 0) reject(result.stderr);
-                    ssh.execCommand(`rm -rf ${this.options.labPath}/${name}`).then((result) => {
-                        if(result.code !== 0) reject(result.stderr);
-                        resolve(`${name}`);
-                    })
-                })
-            }).catch((e) => {reject(e)});
-        });
+            });
+            
+            let result = await ssh.execCommand(`${this.options.tearDownScript}`, {cwd: `${this.options.labPath}/${name}`})
+            if(result.code !== 0) throw new Error(`Deletion script failed: ${result.stderr}`);
+            
+            let res = await ssh.execCommand(`rm -rf ${this.options.labPath}/${name}`)
+            if(res.code !== 0) throw new Error(`Directory deletion failed: ${result.stderr}`);      
+        }
+        catch(e)
+        {
+            let message = 'Unknown error';
+            if(e instanceof Error) message = e.message
+            throw new ApiError(500, `Error connecting to Docker host: ${message}`);
+        }
     }
 }
 

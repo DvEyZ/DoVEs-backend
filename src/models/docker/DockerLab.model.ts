@@ -12,28 +12,25 @@ const DockerLabSchema = new Schema({});
 
 DockerLabSchema.methods.getMachines = async function () :Promise<Array<Machine>> {
     // Fetch all machines from the lab
-    return new Promise((resolve, reject) => {
-        dockerConnection().container.list({all:true, filters: {label: [
-            `com.docker.compose.project=${this.name}`
-        ]}}).then((containers :Array<Container>) => {
-            resolve(containers.map((c :Container) :Machine => new DockerMachine(c)));
-        }).catch((e) => {reject(e);})
-    })
+
+    let containers = await dockerConnection().container.list({all:true, filters: {label: [
+        `com.docker.compose.project=${this.name}`
+    ]}});
+
+    return containers.map((c :Container) :Machine => new DockerMachine(c));
 }
 
 DockerLabSchema.methods.getMachine = async function (name :string) :Promise<Machine> {
     // Fetch one machine from the lab 
-    return new Promise((resolve, reject) => {
-        dockerConnection().container.list({all:true, filters: {label: [
-            `com.docker.compose.project=${this.name}`,
-            `com.docker.compose.service=${name}`
-        ]}}).then((c :Array<Container>) => {
-            if(c[0])
-                resolve(new DockerMachine(c[0]));
-            else
-                reject(new ApiError(404, 'Machine not found'));
-        }).catch((e) => {reject(e);})
-    })
+    let c = await dockerConnection().container.list({all:true, filters: {label: [
+        `com.docker.compose.project=${this.name}`,
+        `com.docker.compose.service=${name}`
+    ]}})
+
+    if(c[0])
+        return new DockerMachine(c[0]);
+    else
+        throw new ApiError(404, 'Machine not found');
 }
 
 DockerLabSchema.methods.start = async function (this :Lab) :Promise<any> {
