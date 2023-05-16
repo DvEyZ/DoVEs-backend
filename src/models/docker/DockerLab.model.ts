@@ -70,7 +70,7 @@ DockerLabSchema.methods.labUp = async function (this :Lab) :Promise<any> {
             compose['services'][`${v.name}_${i}`] = {
                 ...machine,
                 ports: v.ports.map((v) => {
-                    return `${this.portPrefix}${('0' + i).slice(-2)}${v.inbound}:${v.outbound}`
+                    return `${this.portPrefix}${('0' + i).slice(-2)}${v.outbound}:${v.inbound}`
                 })
             }
         }
