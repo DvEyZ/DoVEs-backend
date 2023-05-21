@@ -2,6 +2,7 @@ import { Schema } from "mongoose";
 import { LoginProvider, LoginProviderModel } from "./LoginProvider.model";
 import { GuacamoleService } from "../../services/Guacamole.service";
 import LoginProviderConfig from "../../configs/LoginProviders.config";
+import { ApiError } from "../../utils/ApiError";
 
 export interface GuacamoleLoginProvider extends LoginProvider
 {
@@ -24,10 +25,21 @@ export const GuacamoleLoginProviderSchema = new Schema({
 });
 
 GuacamoleLoginProviderSchema.methods.testConnection = async function () :Promise<any> {
-    // TODO
+    let guacamole = new GuacamoleService(this.config.apiUrl, this.config.adminUsername, this.config.adminPassword);
+    try
+    {
+        await guacamole.check();
+    }
+    catch(e)
+    {
+        throw new ApiError(500, `Could not connect to ${this.config.apiUrl}. Make sure the server is up, and check the password you provided. 
+        Details: ${e}`)
+    }
 }
 
 GuacamoleLoginProviderSchema.methods.createEnvironment = async function (name :string, config :{}) :Promise<any> {
+    await this.testConnection();
+
     let guacamole = new GuacamoleService(this.config.apiUrl, this.config.adminUsername, this.config.adminPassword);
     
     await guacamole.userGroup(name).create();
@@ -37,6 +49,8 @@ GuacamoleLoginProviderSchema.methods.createEnvironment = async function (name :s
 GuacamoleLoginProviderSchema.methods.createConnection = async function (name :string, group :string, host :string, port :number, config :{
     protocol: string
 }) :Promise<any> {
+    await this.testConnection();
+
     let guacamole = new GuacamoleService(this.config.apiUrl, this.config.adminUsername, this.config.adminPassword);
     
     await guacamole.user(name).create(LoginProviderConfig.defaultPassword);
@@ -48,6 +62,8 @@ GuacamoleLoginProviderSchema.methods.createConnection = async function (name :st
     
 
 GuacamoleLoginProviderSchema.methods.tearDownEnvironment = async function (name :string) :Promise<any> {
+    await this.testConnection();
+
     let guacamole = new GuacamoleService(this.config.apiUrl, this.config.adminUsername, this.config.adminPassword);
 
     await guacamole.userGroup(name).delete();
@@ -55,6 +71,8 @@ GuacamoleLoginProviderSchema.methods.tearDownEnvironment = async function (name 
 }
 
 GuacamoleLoginProviderSchema.methods.tearDownConnection = async function (name :string) :Promise<any> {
+    await this.testConnection();
+    
     let guacamole = new GuacamoleService(this.config.apiUrl, this.config.adminUsername, this.config.adminPassword);
 
     await guacamole.user(name).delete();

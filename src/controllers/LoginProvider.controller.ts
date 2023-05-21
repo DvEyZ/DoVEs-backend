@@ -11,12 +11,16 @@ const LoginProviderController = {
             let providers = await LoginProviderModel.find();
 
             return res.status(200).json({
-                loginProviders: providers.map((v) => {
+                loginProviders: await Promise.all(providers.map(async (v) => {
+                    let r = true;
+                    await v.testConnection().catch((e) => {console.log(e); r = false});
+                    
                     return {
                         name: v.name,
                         type: v.type,
+                        reachable: r
                     }
-                })
+                }))
             });
         }
         catch(e)
@@ -48,11 +52,13 @@ const LoginProviderController = {
             if(!model)
                 return res.status(422).json({message: 'Invalid login provider type.'});
 
-            let newProvider = await model.create({
+            let newProvider = new model({
                 name: req.body.name,
                 type: req.body.type,
                 config: req.body.config
             });
+
+            await newProvider.testConnection();
 
             let provider = await newProvider.save();
 
@@ -81,10 +87,14 @@ const LoginProviderController = {
             if(!provider)
                 return res.status(404).json({message: 'Not found'})
 
+            let r = true;
+            await provider.testConnection().catch((e) => {r = false});
+
             return res.status(200).json({
                 name: provider.name,
                 type: provider.type,
                 config: provider.config,
+                reachable: r
             });
         }
         catch(e)

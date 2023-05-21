@@ -46,9 +46,7 @@ export class GuacamoleService implements IGuacamoleService
     } = {};
 
     constructor(private apiUrl :string, private adminUsername :string, private adminPassword :string)
-    {
-        this.#getToken();
-    }
+    {}
 
     async #requireNewToken() :Promise<any>
     {
@@ -68,28 +66,30 @@ export class GuacamoleService implements IGuacamoleService
 
     async #getToken() :Promise<{token :string, dataSource :string}>
     {
-        if(!GuacamoleService.apis[this.apiUrl])
+        if(!GuacamoleService.apis[`${this.apiUrl}-${this.adminUsername}`])
         {
             let newKey = await this.#requireNewToken();
 
-            GuacamoleService.apis[this.apiUrl] = {
+            GuacamoleService.apis[`${this.apiUrl}-${this.adminUsername}`] = {
                 token: newKey.authToken,
                 dataSource: newKey.dataSource,
             }
         }
-        let key = GuacamoleService.apis[this.apiUrl];
+        let key = GuacamoleService.apis[`${this.apiUrl}-${this.adminUsername}`];
 
         // check if key is valid, retry on 401.
         let v = await fetch(`${this.apiUrl}/session/data/${key.dataSource}/users?` + new URLSearchParams({
             token: key.token
         }));
 
-        if(v.status === 401)
+        if(v.status === 401 || v.status === 403)
         {
-            key = await this.#requireNewToken().then((res) => res.json()).then((json) => {return {
-                token: json.authToken,
-                dataSource: json.dataSource,
-            }});
+            let newKey = await this.#requireNewToken();
+            let key = {
+                token: newKey.authToken,
+                dataSource: newKey.dataSource
+            }
+            GuacamoleService.apis[`${this.apiUrl}-${this.adminUsername}`] = key;
         }
 
         return key;
@@ -121,9 +121,12 @@ export class GuacamoleService implements IGuacamoleService
     {
         let { token, dataSource } = await this.#getToken();
 
-        await fetch(`${this.apiUrl}/session/data/${dataSource}/users?` + new URLSearchParams({
+        let res = await fetch(`${this.apiUrl}/session/data/${dataSource}/users?` + new URLSearchParams({
             token: token
-        }));
+        })).catch((e) => {throw new Error(e.message)});
+
+        if(!res.ok)
+            throw new Error(`Server responded with status ${res.status}`)
     }
 
     user(name :string) :GuacamoleServiceUser {
