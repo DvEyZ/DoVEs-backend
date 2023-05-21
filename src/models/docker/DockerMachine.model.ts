@@ -1,6 +1,7 @@
 import { Machine } from "../Machine.model";
 import DockerConfig from "../../configs/Docker.config";
 import { Container } from "node-docker-api/lib/container";
+import { dockerComposeConnection, dockerConnection } from "../../services/Docker.service";
 
 interface ContainerData {[key :string]: any};
 
@@ -8,6 +9,7 @@ export class DockerMachine implements Machine
 {
     container :Container;
     name :string;
+    lab :string;
     type :string;
     address: string;
     portRedirections: Array<{ inbound: number; outbound: number;  access: string | undefined }>;
@@ -19,7 +21,8 @@ export class DockerMachine implements Machine
         
         let data :ContainerData = this.container.data;
 
-        this.name = data.Labels['com.docker.compose.service']
+        this.name = data.Labels['com.docker.compose.service'];
+        this.lab = data.Labels['com.docker.compose.project'];
         this.type = 'docker';
         this.address = DockerConfig.api?.host || 'localhost';
         let prs = data.Ports.map((v :{IP :string, PrivatePort :number, PublicPort :number, Type :string}) => {
@@ -53,7 +56,14 @@ export class DockerMachine implements Machine
 
     async restart() :Promise<Container> 
     {
-        return this.container.restart();
+        await this.container.stop();
+        await this.container.delete();
+        await dockerComposeConnection().rebuildMachine(this.lab, this.name);
+        let mxns = await dockerConnection().container.list({filters: {label: [
+            `com.docker.compose.project=${this.lab}`,
+            `com.docker.compose.service=${this.name}`
+        ]}}); 
+        return mxns[0];
     }
 
     async tearDown() :Promise<any>

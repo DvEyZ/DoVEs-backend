@@ -102,7 +102,7 @@ export class GuacamoleService implements IGuacamoleService
             token: token
         })).then((res) => res.json());
 
-        let a :any = Object.values(cons).filter((v :any) => v.name === connectionName)[0];
+        let a :any = Object.values(cons).filter((v :any) => v?.name === connectionName)[0];
         return a?.identifier;
     }
 

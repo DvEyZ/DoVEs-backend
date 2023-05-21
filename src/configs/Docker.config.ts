@@ -19,6 +19,7 @@ interface IDockerConfig
         labPath :string,
         createScript :string,
         tearDownScript :string,
+        rebuildMachineScript :string,
         host? :string,  // host of remote Docker socket, if via ssh
         port? :number,  // ssh port of remote Docker socket, if via ssh
         user? :string,  // ssh user, if via ssh
@@ -46,6 +47,7 @@ const DockerConfig :IDockerConfig = {
         labPath: process.env.LAB_PATH!,
         createScript: process.env.DOCKER_COMPOSE_CREATE_SCRIPT!,
         tearDownScript: process.env.DOCKER_COMPOSE_TEAR_DOWN_SCRIPT!,
+        rebuildMachineScript: process.env.DOCKER_COMPOSE_REBUILD_MACHINE_SCRIPT!,
         ...(process.env.DOCKER_VIA === 'local' ? {} : 
         process.env.DOCKER_VIA === 'ssh' ? {
             host: process.env.DOCKER_SSH_HOST,

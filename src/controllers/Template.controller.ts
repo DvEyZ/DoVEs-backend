@@ -41,7 +41,7 @@ const TemplateController = {
                 return res.status(422).json({message: 'Missing properties.'});
 
             if(await TemplateModel.findOne({name: req.body.name}))
-                return res.status(409).json({message: `Template "${req.body.name} already exists`})
+                return res.status(409).json({message: `Template ${req.body.name} already exists`})
             
             let model = TemplateFactory(req.body.type);
 

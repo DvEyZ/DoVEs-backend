@@ -41,7 +41,7 @@ const LoginProviderController = {
                 return res.status(422).json({message: 'Missing properties.'});
 
             if(await LoginProviderModel.findOne({name: req.body.name}))
-                return res.status(409).json({message: `Login provider "${req.body.name} already exists`})
+                return res.status(409).json({message: `Login provider ${req.body.name} already exists`})
 
             let model = LoginProviderFactory(req.body.type);
 

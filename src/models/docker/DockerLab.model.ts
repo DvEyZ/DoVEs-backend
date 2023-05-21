@@ -44,8 +44,7 @@ DockerLabSchema.methods.stop = async function (this :Lab) :Promise<any> {
 }
 
 DockerLabSchema.methods.restart = async function (this :Lab) :Promise<any> {
-    let machines :Machine[] = await this.getMachines()
-    await Promise.all(machines.map(async (m) => {await m.restart();}))
+    await dockerComposeConnection().rebuildLab(this.name);
 }
 
 DockerLabSchema.methods.labUp = async function (this :Lab) :Promise<any> {    
@@ -82,7 +81,6 @@ DockerLabSchema.methods.labUp = async function (this :Lab) :Promise<any> {
 }
 
 DockerLabSchema.methods.labDown = async function () {
-    // Tu coś nie działa
     await dockerComposeConnection().tearDownLab(this.name);
 }
 

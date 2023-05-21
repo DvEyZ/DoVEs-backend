@@ -14,8 +14,9 @@ DoVEs - Docker Virtual Environments is a software for creating virtual environme
 - `DOCKER_SSH_USERNAME` - username for remote Docker host. Required if `DOCKER_VIA` is `ssh`.
 - `DOCKER_SSH_KEY` - path to private key used to connect to remote Docker host. Required if `DOCKER_VIA` is `ssh`.
 - `LAB_PATH` - absolute path to directory containing lab data on Docker host. Required.
-- `DOCKER_COMPOSE_CREATE_SCRIPT` - script used to set up a lab. It will operate in newly created directory in `LAB_PATH`, with `docker-compose.yml` present. Usually `docker-compose up` will be enough.
+- `DOCKER_COMPOSE_CREATE_SCRIPT` - script used to set up a lab. It will operate in newly created directory in `LAB_PATH`, with `docker-compose.yml` present. Usually `docker-compose up -d` will be enough.
 - `DOCKER_COMPOSE_TEAR_DOWN_SCRIPT` - script used to tear down a lab. It will operate in lab directory in `LAB_PATH`, with `docker-compose.yml` present. Usually `docker-compose down` will be enough.
+- `DOCKER_COMPOSE_REBUILD_MACHINE_SCRIPT` - script used to rebuild a single machine. It will operate in lab directory in `LAB_PATH`, provided with one argument, namely the name of the machine to be rebuilt. Usually `docker-compose up -d --build $1` will be enough.
 - `LP_DEFAULT_PASSWORD` - default password for newly created login provider users. Defaults to `password`.
 
 ## Known issues
