@@ -13,7 +13,7 @@ const LoginProviderController = {
             return res.status(200).json({
                 loginProviders: await Promise.all(providers.map(async (v) => {
                     let r = true;
-                    await v.testConnection().catch((e) => {console.log(e); r = false});
+                    await v.testConnection().catch((e) => {r = false});
                     
                     return {
                         name: v.name,

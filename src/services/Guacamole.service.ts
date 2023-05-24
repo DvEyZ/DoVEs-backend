@@ -160,7 +160,7 @@ export class GuacamoleService implements IGuacamoleService
                         "password": password,
                         "attributes": {
                             "disabled": "",
-                            "expired": "",
+                            "expired": true,
                             "access-window-start": "",
                             "access-window-end": "",
                             "valid-from": "",
