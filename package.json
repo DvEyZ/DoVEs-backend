@@ -7,10 +7,10 @@
     "start": "node dist/app.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/app.js\"",
     "postinstall": "flatten-dependencies docker-modem"
-
   },
   "dependencies": {
     "@types/yaml": "^1.9.7",
+    "@vmngr/libvirt": "^0.0.5",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
     "debug": "~2.6.9",

@@ -79,4 +79,5 @@ GuacamoleLoginProviderSchema.methods.tearDownConnection = async function (name :
     await guacamole.connection(name).delete();
 }
 
-export const GuacamoleLoginProviderModel = LoginProviderModel.discriminator<GuacamoleLoginProvider>('guacamole', GuacamoleLoginProviderSchema);
+export const GuacamoleLoginProviderModel = 
+    LoginProviderModel.discriminator<GuacamoleLoginProvider>('LoginProvider:guacamole', GuacamoleLoginProviderSchema, 'guacamole');
